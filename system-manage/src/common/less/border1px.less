@@ -1,0 +1,12 @@
+.border-1px(@color) {
+  position: relative;
+
+  &:after {
+    width: 100%;
+    content: ' ';
+    position: absolute;
+    border: 1px solid @color;
+    bottom: 0;
+    left: 0;
+  }
+}
