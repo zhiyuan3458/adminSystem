@@ -1,6 +1,6 @@
 <template>
   <div class="main-table-content-wrapper" ref="tableWrapper">
-    <collapse-bar :collapsedWrapper="collapsedWrapper" @getCollapsedWrapperWidth="getCollapsedWrapperWidth"></collapse-bar>
+    <collapse-bar :collapsedWrapper="collapsedWrapper" @getLzyTableWrapperMarginLeft="getLzyTableWrapperMarginLeft"></collapse-bar>
     <lzy-table-wrapper :lzyTableWrapper="lzyTableWrapper"></lzy-table-wrapper>
   </div>
 </template>
@@ -21,8 +21,7 @@ export default {
         data: []
       },
       lzyTableWrapper: {
-        width: 0,
-        left: collapsedWrapperWidth
+        marginLeft: collapsedWrapperWidth
       }
     };
   },
@@ -33,14 +32,13 @@ export default {
   },
 
   methods: {
-    getCollapsedWrapperWidth (...data) {
-      this.lzyTableWrapper.width = this.$refs.tableWrapper.offsetWidth - data[0].collapsedWrapperWidth;
-      this.lzyTableWrapper.left = data[0].left;
+    getLzyTableWrapperMarginLeft (...data) {
+      this.lzyTableWrapper.marginLeft = data[0].left;
     }
   },
 
   mounted () {
-    this.lzyTableWrapper.width = this.$refs.tableWrapper.offsetWidth - this.collapsedWrapper.width;
+    this.lzyTableWrapper.marginLeft = this.collapsedWrapper.width;
   }
 };
 </script>

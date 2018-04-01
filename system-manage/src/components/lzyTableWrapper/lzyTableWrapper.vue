@@ -1,12 +1,12 @@
 <template>
-  <div class="lzy-table-wrapper" :style="{width: lzyTableWrapper.width + 'px', left:lzyTableWrapper.left + 'px'}">
+  <div class="lzy-table-wrapper" :style="{marginLeft: lzyTableWrapper.marginLeft + 'px'}">
     <!-- 按钮组 -->
     <div class="btn-group" ref="btnGroup">
-      <el-button size="mini" icon="el-icon-plus">返回上级菜单</el-button>
+      <el-button size="mini" icon="el-icon-back">返回上级菜单</el-button>
       <el-button size="mini" icon="el-icon-plus">新增</el-button>
-      <el-button size="mini" icon="el-icon-plus">删除</el-button>
-      <el-button size="mini" icon="el-icon-plus">导入</el-button>
-      <el-button size="mini" icon="el-icon-plus">导出</el-button>
+      <el-button size="mini" icon="el-icon-delete">删除</el-button>
+      <el-button size="mini" icon="el-icon-upload2">导入</el-button>
+      <el-button size="mini" icon="el-icon-download">导出</el-button>
     </div>
     <!-- 导航位置 -->
     <div class="nav-bar" ref="navBar">
@@ -184,13 +184,10 @@ export default {
 @import "./lzyTableWrapper";
 @import "../../common/less/border1px";
 .lzy-table-wrapper {
-  padding: 5px 0 5px 11px;
+  padding: 5px 0 5px 10px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  float: left;
-  position: absolute;
-  left: 260px;
 
   .btn-group {
     padding-bottom: 5px;
@@ -198,6 +195,7 @@ export default {
   }
 
   .nav-bar {
+    display: inline-block;
     margin: 8px 0 10px 0;
 
     .el-icon-star-on {
@@ -226,6 +224,7 @@ export default {
 
       .pagenation1 {
         float: right;
+        margin: 4px 5px 0 0;
       }
     }
   }

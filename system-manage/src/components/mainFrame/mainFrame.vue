@@ -196,11 +196,9 @@ export default {
 
     /* 主要内容 */
     .main-content {
-      width:100%;
-      position: absolute;
-      top: 47px;
+      max-width:100%;
       bottom: 26px;
-      left: 40px;
+      margin-left: 40px;
     }
 
     /* 尾部 */

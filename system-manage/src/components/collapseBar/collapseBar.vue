@@ -1,5 +1,5 @@
 <template>
-  <div class="collapsed-wrapper" ref="collapsedWrapper" :style="{width: collapsedWrapperWidth + 'px', height: computeCollapsedWrapperHeight, left: collapsedWrapperLeft + 'px'}">
+  <div class="collapsed-wrapper" ref="collapsedWrapper" :style="{width: collapsedWrapperWidth + 'px', height: computeCollapsedWrapperHeight, marginLeft: collapsedWrapperMarginLeft + 'px'}">
     <div class="content-wrapper">
       <div class="top" v-if="collapsedWrapper.topShow"></div>
       <div class="main">
@@ -7,24 +7,24 @@
           :data="data4"
           show-checkbox
           node-key="id"
+          @node-click="handleClickText"
           default-expand-all
           :expand-on-click-node="false"
         >
       <span class="custom-tree-node" slot-scope="{ node, data }">
-      <span>{{ node.label }}</span>
-      <span>
-        <el-button
-          type="text"
-          size="mini"
-          @click="() => append(data)">
-          Append
-        </el-button>
-        <el-button
-          type="text"
-          size="mini"
-          @click="() => remove(node, data)">
-          Delete
-        </el-button>
+      <span @hover="handleHoverText">{{ node.label }}</span>
+      <span class="icon-group" v-show="data.iconGroupShow">
+        <span
+          class="el-icon-circle-plus-outline"
+          @click="() => append(data)"
+        ></span>
+        <span
+         class="el-icon-edit"
+        ></span>
+        <span
+          class="el-icon-close"
+          @click="() => remove(node, data)"
+        ></span>
       </span>
     </span>
         </el-tree>
@@ -44,43 +44,54 @@ export default {
     const data = [{
       id: 1,
       label: '一级 1',
+      iconGroupShow: false,
       children: [{
         id: 4,
         label: '二级 1-1',
+        iconGroupShow: false,
         children: [{
           id: 9,
-          label: '三级 1-1-1'
+          label: '三级 1-1-1',
+          iconGroupShow: false
         }, {
           id: 10,
-          label: '三级 1-1-2'
+          label: '三级 1-1-2',
+          iconGroupShow: false
         }]
       }]
     }, {
       id: 2,
       label: '一级 2',
+      iconGroupShow: false,
       children: [{
         id: 5,
-        label: '二级 2-1'
+        label: '二级 2-1',
+        iconGroupShow: false
       }, {
         id: 6,
-        label: '二级 2-2'
+        label: '二级 2-2',
+        iconGroupShow: false
       }]
     }, {
       id: 3,
       label: '一级 3',
+      iconGroupShow: false,
       children: [{
         id: 7,
-        label: '二级 3-1'
+        label: '二级 3-1',
+        iconGroupShow: false
       }, {
         id: 8,
-        label: '二级 3-2'
+        label: '二级 3-2',
+        iconGroupShow: false
       }]
     }];
     return {
+      data: data,
       data4: JSON.parse(JSON.stringify(data)),
       collapsedWrapperHeight: 0,
       collapsedWrapperWidth: this.collapsedWrapper.width,
-      collapsedWrapperLeft: 0,
+      collapsedWrapperMarginLeft: 0,
       arrowClass: 'collapsed-arrow',
       collapsedWrapperWidthTemp: 0
     };
@@ -102,7 +113,7 @@ export default {
 
   methods: {
     append (data) {
-      const newChild = { id: id++, label: 'testtest', children: [] };
+      const newChild = { id: id++, label: 'testtest', iconGroupShow: false, children: [] };
       if (!data.children) {
         this.$set(data, 'children', []);
       }
@@ -114,6 +125,28 @@ export default {
       const index = children.findIndex(d => d.id === data.id);
       children.splice(index, 1);
     },
+
+    handleHoverText () {
+      this.iconGroupShow = true;
+    },
+
+    setIconGroupShow (children) {
+      if (Array.isArray(children)) {
+        children.forEach(item => {
+          item.iconGroupShow = false;
+          if (item.children) {
+            this.setIconGroupShow(item.children);
+          } else {}
+        });
+      } else {
+        return false;
+      }
+    },
+
+    handleClickText (object, node, component) {
+      this.setIconGroupShow(this.data4);
+      object.iconGroupShow = true;
+    },
     // 拖拽函数
     drag (e) {
       if (e.target.className.indexOf('arrowIcon') >= 0) {
@@ -124,22 +157,22 @@ export default {
         document.onmousemove = function (e) {
           e.preventDefault();
           e.stopPropagation();
-          let currentWidth = e.clientX - 51;
+          let currentMarginLeft = e.clientX - 51;
           let documentWidth = document.body.clientWidth;
           documentWidth = documentWidth - 100;
-          if (currentWidth <= 30) {
+          if (currentMarginLeft <= 30) {
             that.collapsedWrapperWidth = 30;
-            that.$emit('getCollapsedWrapperWidth', {collapsedWrapperWidth: 30, left: 30});
+            that.$emit('getLzyTableWrapperMarginLeft', {left: 30});
             return;
           }
-          if (currentWidth >= documentWidth) {
+          if (currentMarginLeft >= documentWidth) {
             that.collapsedWrapperWidth = documentWidth;
-            that.$emit('getCollapsedWrapperWidth', {collapsedWrapperWidth: documentWidth, left: documentWidth});
+            that.$emit('getLzyTableWrapperMarginLeft', {left: documentWidth});
             return;
           }
           // 把collapsedWrapperWidth提交到父组件
-          that.$emit('getCollapsedWrapperWidth', {collapsedWrapperWidth: currentWidth, left: currentWidth});
-          that.collapsedWrapperWidth = currentWidth;
+          that.$emit('getLzyTableWrapperMarginLeft', {left: currentMarginLeft});
+          that.collapsedWrapperWidth = currentMarginLeft;
         };
 
         document.onmouseup = function () {
@@ -153,15 +186,15 @@ export default {
     // 点击侧导航栏的伸缩符可以伸缩侧导航栏
     handleCollapse () {
       if (this.collapsedWrapper.collapsable) {
-        let collapsedWrapperLeft = this.collapsedWrapperLeft;
-        if (collapsedWrapperLeft === 0) {
-          this.collapsedWrapperLeft = -this.collapsedWrapperWidth;
-          this.$emit('getCollapsedWrapperWidth', {collapsedWrapperWidth: 0, left: 0});
+        let collapsedWrapperMarginLeft = this.collapsedWrapperMarginLeft;
+        if (collapsedWrapperMarginLeft === 0) {
+          this.collapsedWrapperMarginLeft = -this.collapsedWrapperWidth;
+          this.$emit('getLzyTableWrapperMarginLeft', {left: 0});
           this.arrowClass = 'open-arrow';
           this.collapsedWrapper.draggable = false;
         } else {
-          this.collapsedWrapperLeft = 0;
-          this.$emit('getCollapsedWrapperWidth', {collapsedWrapperWidth: this.collapsedWrapperWidth, left: this.collapsedWrapperWidth});
+          this.collapsedWrapperMarginLeft = 0;
+          this.$emit('getLzyTableWrapperMarginLeft', {left: this.collapsedWrapperWidth});
           this.arrowClass = 'collapsed-arrow';
           this.collapsedWrapper.draggable = true;
         }
@@ -179,32 +212,47 @@ export default {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   font-size: 14px;
   padding-right: 8px;
 }
 .collapsed-wrapper {
   padding: 8px 4px 0 4px;
-  position: relative;
-  top: 0;
-  bottom: 0;
   border-right: 1px solid #ddd;
   box-sizing: border-box;
+  position: relative;
   float: left;
   z-index: 1000000;
 
   .content-wrapper {
     height: 100%;
     overflow: hidden;
-  }
 
-  .top {
-    height: 50px;
+    .top {
+      height: 50px;
 
-    ul {
-      overflow: hidden;
-      li {
-        float: left;
+      ul {
+        overflow: hidden;
+        li {
+          float: left;
+        }
+      }
+    }
+
+    .main {
+      .icon-group {
+        display: inline-block;
+        margin-left: 7px;
+
+        .el-icon-circle-plus-outline {
+          color: #67C23A;
+        }
+        .el-icon-edit {
+          color: #E6A23C;
+        }
+        .el-icon-close {
+          color: #F56C6C;
+        }
       }
     }
   }
