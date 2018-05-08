@@ -5,6 +5,8 @@ import store from '@/vuex/index.js';
 import ElementUI from 'element-ui';
 import 'common/less/reset.css';
 import 'element-ui/lib/theme-chalk/index.css';
+import '@/components/global.js';
+import './permission';
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);

@@ -1,36 +1,8 @@
 <template>
-  <div class="collapsed-wrapper" ref="collapsedWrapper" :style="{width: collapsedWrapperWidth + 'px', height: computeCollapsedWrapperHeight, marginLeft: collapsedWrapperMarginLeft + 'px'}">
-    <div class="content-wrapper">
-      <div class="top" v-if="collapsedWrapper.topShow"></div>
-      <div class="main">
-        <el-tree
-          :data="data4"
-          show-checkbox
-          node-key="id"
-          @node-click="handleClickText"
-          default-expand-all
-          :expand-on-click-node="false"
-        >
-      <span class="custom-tree-node" slot-scope="{ node, data }">
-      <span @hover="handleHoverText">{{ node.label }}</span>
-      <span class="icon-group" v-show="data.iconGroupShow">
-        <span
-          class="el-icon-circle-plus-outline"
-          @click="() => append(data)"
-        ></span>
-        <span
-         class="el-icon-edit"
-        ></span>
-        <span
-          class="el-icon-close"
-          @click="() => remove(node, data)"
-        ></span>
-      </span>
-    </span>
-        </el-tree>
-      </div>
-    </div>
-    <div class="arrow-wrapper" :style="{height: computeCollapsedWrapperHeight}" @mousedown="drag">
+  <div class="collapsed-wrapper" ref="collapsedWrapper" :style="{width: collapsedWrapperWidth + 'px', marginLeft: collapsedWrapperMarginLeft + 'px'}">
+    <slot name="header"></slot>
+    <slot name="content"></slot>
+    <div class="arrow-wrapper" @mousedown="drag">
       <div class="arrowIcon" :class="arrowClass" @click.stop="handleCollapse"></div>
     </div>
     <!--<div v-show="columnLine" class="column-line" :style="{height: computeCollapsedWrapperHeight}" ref="columnLine"></div>-->
@@ -44,7 +16,6 @@ export default {
     const data = [{
       id: 1,
       label: '一级 1',
-      iconGroupShow: false,
       children: [{
         id: 4,
         label: '二级 1-1',
@@ -87,31 +58,33 @@ export default {
       }]
     }];
     return {
-      data: data,
       data4: JSON.parse(JSON.stringify(data)),
       collapsedWrapperHeight: 0,
       collapsedWrapperWidth: this.collapsedWrapper.width,
       collapsedWrapperMarginLeft: 0,
       arrowClass: 'collapsed-arrow',
-      collapsedWrapperWidthTemp: 0
+      collapsedWrapperWidthTemp: 0,
+      expandShow1: this.expandShow
     };
   },
 
   props: {
-    collapsedWrapper: Object
+    collapsedWrapper: Object,
+    expandShow: Boolean
+  },
+
+  watch: {
+    expandShow: function () {
+      this.expandShow1 = this.expandShow;
+    }
   },
 
   created () {
     this.collapsedWrapperWidth = this.collapsedWrapper.width;
   },
 
-  computed: {
-    computeCollapsedWrapperHeight () {
-      return document.body.offsetHeight - 73 + 'px';
-    }
-  },
-
   methods: {
+    // 新增树组件的指定结点
     append (data) {
       const newChild = { id: id++, label: 'testtest', iconGroupShow: false, children: [] };
       if (!data.children) {
@@ -119,17 +92,19 @@ export default {
       }
       data.children.push(newChild);
     },
+
+    // 移除树组件的指定结点
     remove (node, data) {
+      console.log(node);
+      console.log(data);
+      return;
       const parent = node.parent;
       const children = parent.data.children || parent.data;
       const index = children.findIndex(d => d.id === data.id);
       children.splice(index, 1);
     },
 
-    handleHoverText () {
-      this.iconGroupShow = true;
-    },
-
+    // 递归，使得data数组的所有iconGroupShow变为false
     setIconGroupShow (children) {
       if (Array.isArray(children)) {
         children.forEach(item => {
@@ -143,36 +118,44 @@ export default {
       }
     },
 
-    handleClickText (object, node, component) {
+    // 点击树组件的某个结点把添加、编辑和删除按钮显示出来
+    handleClickText (node, data) {
       this.setIconGroupShow(this.data4);
-      object.iconGroupShow = true;
+      const parent = node.parent;
+      const children = parent.data.children || parent.data;
+      const index = children.findIndex(item => item.id === data.id);
+      let obj = Object.assign({}, children[index], {iconGroupShow: true});
+      children.splice(index, 1, obj);
     },
-    // 拖拽函数
+    // 拖拽可伸缩侧导航栏函数
     drag (e) {
+      // 如果是按了箭头收缩的话，就不给拉动
       if (e.target.className.indexOf('arrowIcon') >= 0) {
         return;
       }
+      // 看传入的draggable值是否为true才给拉伸
       if (this.collapsedWrapper.draggable) {
         let that = this;
         document.onmousemove = function (e) {
           e.preventDefault();
           e.stopPropagation();
-          let currentMarginLeft = e.clientX - 51;
+          let currentMarginWidth = e.clientX - 51;
           let documentWidth = document.body.clientWidth;
-          documentWidth = documentWidth - 100;
-          if (currentMarginLeft <= 30) {
+          console.log(documentWidth);
+          documentWidth = documentWidth - 500;
+          if (currentMarginWidth <= 30) {
             that.collapsedWrapperWidth = 30;
             that.$emit('getLzyTableWrapperMarginLeft', {left: 30});
             return;
           }
-          if (currentMarginLeft >= documentWidth) {
+          if (currentMarginWidth >= documentWidth) {
             that.collapsedWrapperWidth = documentWidth;
             that.$emit('getLzyTableWrapperMarginLeft', {left: documentWidth});
             return;
           }
           // 把collapsedWrapperWidth提交到父组件
-          that.$emit('getLzyTableWrapperMarginLeft', {left: currentMarginLeft});
-          that.collapsedWrapperWidth = currentMarginLeft;
+          that.$emit('getLzyTableWrapperMarginLeft', {left: currentMarginWidth});
+          that.collapsedWrapperWidth = currentMarginWidth;
         };
 
         document.onmouseup = function () {
@@ -207,58 +190,18 @@ export default {
 </script>
 
 <style lang="less">
-@import "../../common/less/fonts.css";
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  font-size: 14px;
-  padding-right: 8px;
-}
+@import "./less/style.css";
 .collapsed-wrapper {
+  height: 100%;
   padding: 8px 4px 0 4px;
   border-right: 1px solid #ddd;
   box-sizing: border-box;
   position: relative;
   float: left;
-  z-index: 1000000;
-
-  .content-wrapper {
-    height: 100%;
-    overflow: hidden;
-
-    .top {
-      height: 50px;
-
-      ul {
-        overflow: hidden;
-        li {
-          float: left;
-        }
-      }
-    }
-
-    .main {
-      .icon-group {
-        display: inline-block;
-        margin-left: 7px;
-
-        .el-icon-circle-plus-outline {
-          color: #67C23A;
-        }
-        .el-icon-edit {
-          color: #E6A23C;
-        }
-        .el-icon-close {
-          color: #F56C6C;
-        }
-      }
-    }
-  }
 
   .arrow-wrapper {
     width: 10px;
+    height: 100%;
     position: absolute;
     top: 0;
     right: -10px;
@@ -280,15 +223,6 @@ export default {
     .open-arrow {
       background: url('./img/arrow.png') no-repeat -11px 0;
     }
-  }
-  // 竖线
-  .column-line {
-    width: 1px;
-    background-color: black;
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 10000;
   }
 }
 </style>

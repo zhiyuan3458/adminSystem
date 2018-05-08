@@ -1,61 +1,6 @@
 <template>
   <div class="lzy-table-wrapper" :style="{marginLeft: lzyTableWrapper.marginLeft + 'px'}">
-    <!-- 按钮组 -->
-    <div class="btn-group" ref="btnGroup">
-      <el-button size="mini" icon="el-icon-back">返回上级菜单</el-button>
-      <el-button size="mini" icon="el-icon-plus">新增</el-button>
-      <el-button size="mini" icon="el-icon-delete">删除</el-button>
-      <el-button size="mini" icon="el-icon-upload2">导入</el-button>
-      <el-button size="mini" icon="el-icon-download">导出</el-button>
-    </div>
-    <!-- 导航位置 -->
-    <div class="nav-bar" ref="navBar">
-      <el-breadcrumb separator-class="el-icon-minus">
-        <el-breadcrumb-item><span class="el-icon-star-on"></span>首页</el-breadcrumb-item>
-        <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-        <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-        <el-breadcrumb-item>活动详情</el-breadcrumb-item>
-      </el-breadcrumb>
-    </div>
-    <!-- 表格 -->
-    <div class="table-wrapper">
-      <div class="table-title">公路桥涵技术状况评定列表</div>
-      <el-table
-        :data="tableData"
-        size="mini"
-        border
-        :height="lzyTableWrapperHeight"
-        :header-cell-class-name="setTableHeadBackground"
-      >
-        <el-table-column
-          prop="name"
-          label="名字"
-          header-align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="address"
-          label="地址"
-          header-align="center"
-        ></el-table-column>
-        <el-table-column
-          prop="date"
-          label="日期"
-          header-align="center"
-        ></el-table-column>
-      </el-table>
-      <div class="pagenation-wrapper">
-        <el-pagination
-          class="pagenation1"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="currentPage"
-          :page-sizes="[100, 200, 300, 400]"
-          :page-size="100"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="400">
-        </el-pagination>
-      </div>
-    </div>
+    <slot name="tableContent"></slot>
   </div>
 </template>
 
@@ -66,20 +11,40 @@ export default {
   },
   data () {
     return {
+      mainContent: true,
       lzyTableWrapperHeight: 0,
-      tableData: [{
+      tableData: [
+      {
         date: '2016-05-02',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1518 弄'
-      }, {
+      },
+      {
         date: '2016-05-04',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1517 弄'
-      }, {
+      },
+      {
         date: '2016-05-01',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1519 弄'
-      }, {
+      },
+      {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      },
+      {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      },
+      {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      },
+      {
         date: '2016-05-03',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1516 弄'
@@ -147,21 +112,18 @@ export default {
         date: '2016-05-03',
         name: '王小虎',
         address: '上海市普陀区金沙江路 1516 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }],
-      setTableHeadBackground: 'table-title-class',
-      currentPage: 1
+      }
+      ],
+      setTableHeadBackground: 'table-title-class title',
+      currentPage: 1,
+      search: '',
+      // 新增框的属性设置
+      visibility: false,
+      addForm: {
+        user: '',
+        region: '',
+        region1: ''
+      }
     };
   },
 
@@ -171,11 +133,22 @@ export default {
     },
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`);
+    },
+    handleAddBtn () {
+      this.mainContent = false;
+      this.visibility = true;
+    },
+    handleBackBtn () {
+      this.mainContent = true;
+      this.visibility = false;
+    },
+    onSubmit () {
+      console.log('submit!');
     }
   },
 
   mounted () {
-    this.lzyTableWrapperHeight = document.body.offsetHeight - 245;
+    this.lzyTableWrapperHeight = document.body.offsetHeight - 210;
   }
 };
 </script>
@@ -183,48 +156,184 @@ export default {
 <style lang="less">
 @import "./lzyTableWrapper";
 @import "../../common/less/border1px";
+@import "../../common/less/theme";
 .lzy-table-wrapper {
   padding: 5px 0 5px 10px;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 
-  .btn-group {
-    padding-bottom: 5px;
-    .border-1px(#ddd);
-  }
+  .main-content-wrapper {
+    .btn-group {
+      padding-bottom: 7px;
+      .border-1px(#ddd);
 
-  .nav-bar {
-    display: inline-block;
-    margin: 8px 0 10px 0;
+      .el-button--mini, .el-button--mini.is-round {
+        padding: 6px;
+      }
 
-    .el-icon-star-on {
-      display: inline-block;
-      margin-right: 5px;
-      color: #F59C00;
+      .el-icon-back {
+        color: #5CC48F;
+        font-weight: 700;
+      }
+
+      .el-icon-plus {
+        color: #D85C0D;
+        font-weight: 700;
+      }
+
+      .el-icon-delete {
+        color: #DC3F2C;
+        font-weight: 700;
+      }
+
+      .el-icon-upload2 {
+        color: #217FBC;
+        font-weight: 700;
+      }
+
+      .el-icon-download {
+        color: #2FA2E0;
+        font-weight: 700;
+      }
+    }
+
+    .nav-bar {
+         display: inline-block;
+         margin: 5px 0;
+
+         .el-icon-star-on {
+           display: inline-block;
+           margin-right: 5px;
+           color: #F59C00;
+         }
+
+         .el-breadcrumb__inner {
+            font-family: @content-font-family;
+            font-weight: 100 !important;
+          }
+    }
+
+    .table-wrapper {
+      .table-title {
+        width: 100%;
+        height: 21px;
+        line-height: 21px;
+        padding: 5px 0;
+        background: @table-title-bg-color;
+        color: #fff;
+        text-align: center;
+        .title;
+      }
+
+      .cell {
+        .content;
+        line-height: 18px;
+      }
+
+      .pagenation-wrapper {
+        width: 100%;
+        height: 35px;
+        overflow: hidden;
+        background: @pagenation-bg-color;
+
+        .search-input {
+          min-height: 23px;
+          display: inline-block;
+          margin: 4px 0 0 10px;
+          border: 1px solid #ddd;
+        }
+
+        .el-icon-search {
+          color: #217FBC;
+          cursor: pointer;
+        }
+
+        .pagenation1 {
+          float: right;
+          margin: 1px 5px 0 0;
+        }
+      }
     }
   }
 
-  .table-wrapper {
-    .table-title {
-      width: 100%;
-      height: 30px;
-      line-height: 30px;
-      padding: 5px 0;
-      background: @table-title-bg-color;
-      color: #fff;
-      text-align: center;
+  .addForm-wrapper {
+
+    .fix-wrapper {
+      .btn-group {
+        padding-bottom: 5px;
+        .border-1px(#ddd);
+
+        .el-button--mini, .el-button--mini.is-round {
+          padding: 6px;
+        }
+
+        .el-icon-success {
+          color: #67C23A;
+          font-weight: 700;
+        }
+
+        .el-icon-arrow-left {
+          color: #409EFF;
+          font-weight: 700;
+        }
+
+        .el-icon-printer {
+          color: #F56C6C;
+          font-weight: 700;
+        }
+      }
+      .nav-bar {
+        width: 100%;
+        padding-bottom: 8px;
+        display: inline-block;
+        margin: 5px 0;
+        position: relative;
+
+        .el-icon-star-on {
+          display: inline-block;
+          margin-right: 5px;
+          color: #F59C00;
+        }
+
+        &:after {
+          content: ' ';
+          width: 100%;
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          border-bottom: 1px solid #ddd;
+        }
+      }
     }
 
-    .pagenation-wrapper {
-      width: 100%;
-      height: 40px;
-      line-height: 40px;
-      background: @pagenation-bg-color;
+    .form-wrapper {
+      .basic-info-wrapper {
+        .title {
+          display: flex;
+          align-items: center;
 
-      .pagenation1 {
-        float: right;
-        margin: 4px 5px 0 0;
+          .basic-info-text {
+            display: inline-block;
+            color: #fff;
+            background-color: #56A2E8;
+            border: 1px solid #56A2E8;
+            padding: 6px 5px;
+          }
+
+          .line {
+            flex: 1;
+            border-bottom: 1px solid rgba(0,0,0,0.2);
+          }
+        }
+
+        .lzy-main-content {
+          text-align: left;
+          margin-top: 5px;
+          .pn-ftable {
+            width: 100%;
+          }
+        }
       }
     }
   }
