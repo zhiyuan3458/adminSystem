@@ -7,10 +7,41 @@ mongoose.connection.on('connected', function () {
 
 const models = {
   projects: {
-    id: { type: String, require: true },
     name: {type: String, require: true},
-    url: {type: String, require: true},
-    component: {type: String, require: true}
+    path: {type: String, require: true},
+    componentName: {type: String, require: true, default: 'mainFrame'},
+    children: [
+      {
+        path: {type: String, require: true, default: '/index'},
+        name: {type: String, require: true},
+        imgUrl: {type: String, default: ''},
+        componentName: {type: String, require: true},
+        meta: {
+          title: {type: String, require: true}
+        },
+        children: [
+          {
+            path: {type: String, default: '/index'},
+            name: {type: String},
+            imgUrl: {type: String, default: ''},
+            componentName: {type: String}
+          }
+        ]
+      }
+    ]
+  },
+  menus: {
+    projectId: {type: String, require: true},
+    name: {type: String, require: true},
+    imgUrl: {type: String, require: true},
+    children: [
+      {
+        name: {type: String, require: true},
+        imgUrl: {type: String, require: true},
+        path: {type: String, require: true},
+        componentName: {type: String, require: true}
+      }
+    ]
   }
 };
 

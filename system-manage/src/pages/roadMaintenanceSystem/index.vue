@@ -101,8 +101,14 @@ export default {
 </script>
 
 <style lang="less">
-@import "../../../common/less/theme";
-@import "./less/index";
+@import "../../common/less/theme";
+/* 表头顶部背景 */
+@table-title-bg-color: #56A2E8;
+/* 表头背景 */
+@table-head-bg-color: #F9E7CD;
+/* 分页组件背景色 */
+@pagenation-bg-color: #e1edf9;
+
 .table-container {
   /* 顶部面包屑导航栏 */
   .nav-bar {

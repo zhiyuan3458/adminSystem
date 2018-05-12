@@ -1,1 +1,1 @@
-module.exports = (directory, file) => () => import(`@/page/${directory}/${file}/${file}.vue`);
+module.exports = (path) => () => import(`@/pages/${path}.vue`);

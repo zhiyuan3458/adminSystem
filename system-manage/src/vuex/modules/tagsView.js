@@ -1,9 +1,15 @@
 const tagsView = {
   state: {
+    /* 所有子系统列表 */
+    projectList: [],
+    /* 显示在底部导航栏的子系统列表 */
     visitedViews: [],
     cachedViews: []
   },
   mutations: {
+    SHOW_ALL_VIEWS: (state, data) => {
+      state.projectList = state.projectList.concat(data);
+    },
     ADD_VISITED_VIEWS: (state, view) => {
       /*
         some表示检测数组的元素是否满足某个条件，比如数组中每个元素的path === view.path
@@ -12,12 +18,11 @@ const tagsView = {
       if (state.visitedViews.some(v => v.path === view.path)) return;
       state.visitedViews.push({
         name: view.name,
-        path: view.path,
-        title: view.meta.title || 'no-name'
+        path: view.path
       });
-      if (!view.meta.noCache) {
-        state.cachedViews.push(view.name);
-      }
+      // if (!view.meta.noCache) {
+      //   state.cachedViews.push(view.name);
+      // }
     },
     DEL_VISITED_VIEWS: (state, view) => {
       for (const [i, v] of state.visitedViews.entries()) {
@@ -56,6 +61,9 @@ const tagsView = {
     }
   },
   actions: {
+    showAllViews ({ commit }, data) {
+      commit('SHOW_ALL_VIEWS', data);
+    },
     addVisitedViews ({ commit }, view) {
       commit('ADD_VISITED_VIEWS', view);
     },

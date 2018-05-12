@@ -1,19 +1,20 @@
 <template>
-<div>
-  <div :id='model.id' @click="toggle" @dblclick="changeType" draggable='true' @dragstart='dragStart' @dragover='dragOver' @dragenter='dragEnter' @dragleave='dragLeave' @drop='drop' @dragend='dragEnd' class='treeNodeText' @mouseover='mouseOver' @mouseout='mouseOut' :style='styleObj'>
-    <span :class="[isClicked ? 'nodeClicked' : '','vue-drag-node-icon']"></span>
-    {{model.name}}
-    <span @click="removeChild(model.id)" v-if='model.id !="0"'>&nbsp;x</span>
-  </div>
-  <div class='treeMargin' v-show="open" v-if="isFolder">
-    <diuni-tree v-for="model in model.children" :model="model" :key='model.id' :current-highlight='currentHighlight' :default-text='defaultText' 　:hover-color='hoverColor' :highlight-color='highlightColor'>
-    </diuni-tree>
-    <div class='changeTree' @click="addChild" @drop='dropPlus' @dragover='dragOverPlus' @dragenter='dragEnterPlus'>+</div>
-  </div>
-</div>
+  <swiper :options="swiperOption" ref="mySwiper">
+    <!-- slides -->
+    <swiper-slide>I'm Slide 1</swiper-slide>
+    <swiper-slide>I'm Slide 2</swiper-slide>
+    <swiper-slide>I'm Slide 3</swiper-slide>
+    <swiper-slide>I'm Slide 4</swiper-slide>
+    <swiper-slide>I'm Slide 5</swiper-slide>
+    <swiper-slide>I'm Slide 6</swiper-slide>
+    <swiper-slide>I'm Slide 7</swiper-slide>
+    <!-- Optional controls -->
+    <div class="swiper-pagination"  slot="pagination"></div>
+  </swiper>
 </template>
 
 <script>
+import { swiper, swiperSlide } from 'vue-awesome-swiper';
 let id = 1000;
 let fromData = '';
 let toData = '';
@@ -22,12 +23,21 @@ let nodeClicked = undefined;   // Attention: 递归的所有组件共享同一�
 
 export default {
   name: 'diuniTree',
+  components: {
+    swiper,
+    swiperSlide
+  },
   data: function () {
     return {
       open: false,
       isClicked: false,
       styleObj: {
         background: 'white'
+      },
+      swiperOption: {
+        pagination: {
+          el: '.swiper-pagination'
+        }
       }
     };
   },
@@ -43,6 +53,9 @@ export default {
       return this.model.children &&
         this.model.children.length;
     },
+    mySwiper () {
+      return this.$refs.mySwiper.swiper
+    }
   },
   methods: {
     toggle () {

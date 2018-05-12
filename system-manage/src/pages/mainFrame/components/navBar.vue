@@ -10,7 +10,7 @@
         :key="tag.path"
         @contextmenu.prevent.native="openMenu(tag, $event)"
       >
-        {{tag.title}}
+        {{tag.name}}
         <span class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
       </router-link>
     </scroll-pane>
@@ -18,66 +18,23 @@
     <div class="select-project">
       <div class="three-point">
         <div class="project-model">
-          <swiper :options="swiperOption">
-            <swiper-slide>
-              <ul>
-                <router-link tag="li" to="/table1">
+          <swiper :options="swiperOption" ref="mySwiper">
+            <swiper-slide v-for="(swiper, index) in swiperViews" :key="index">
+              <ul class="project-lists">
+                <router-link
+                  tag="li"
+                  v-for="item in swiper"
+                  :key="item.path"
+                  :to="item.path"
+                  @click.native="addToNavBar"
+                >
                   <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
+                  <p class="project-name">{{item.name}}</p>
                 </router-link>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-              </ul>
-            </swiper-slide>
-            <swiper-slide>
-              <ul>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
-                <li>
-                  <img src="../img/project.png" alt="">
-                  <span class="project-name">123</span>
-                </li>
               </ul>
             </swiper-slide>
             <div class="swiper-pagination"  slot="pagination"></div>
           </swiper>
-
         </div>
       </div>
     </div>
@@ -110,32 +67,51 @@ export default {
       selectedTag: {},
       swiperOption: {
         pagination: {
-          el: '.swiper-pagination',
-          clickable :true
-        },
-        mousewheel: true
+          el: '.swiper-pagination'
+        }
       }
     };
   },
 
   computed: {
+    /* 显示在底部导航栏的子系统 */
     visitedViews () {
       return this.$store.state.tagsView.visitedViews;
     },
+    /* 显示在swiper的列表 */
+    swiperViews () {
+      let projectList = [];
+      const swiperItemSizes = 8;
+      let swiperNum = this.projectList.length % swiperItemSizes === 0 ? Math.floor(this.projectList.length / swiperItemSizes) : Math.floor(this.projectList.length / swiperItemSizes) + 1;
+      for (let i = 0; i < swiperNum; i++) {
+        let arr = [];
+        if (this.projectList.length < swiperItemSizes) {
+          projectList.push(this.projectList);
+        } else {
+          for (let j = i * swiperItemSizes; j < swiperItemSizes; j++) {
+            arr.push(this.projectList[j]);
+          }
+          projectList.push(arr);
+        }
+      }
+      return projectList;
+    },
     swiper () {
-      return this.$refs.mySwiper.swiper
+      return this.$refs.mySwiper.swiper;
     },
     ...mapGetters([
-      'sideBar'
+      'sideBar',
+      'visitedViews',
+      'projectList'
     ])
   },
 
   watch: {
     // 就是$route: function()简写
-    $route () {
-      this.addViewTags();
-      this.moveToCurrentTag();
-    },
+//    $route () {
+//      this.addViewTags();
+//      this.moveToCurrentTag();
+//    },
     /*
       value是visible现在的值
       true表示要右键选项卡出来了，要监听右键menu的事件
@@ -151,8 +127,8 @@ export default {
   },
 
   methods: {
-    handleClickProject (projectName) {
-      this.$router.push('');
+    addToNavBar () {
+      this.addViewTags();
     },
     // 判断该路由是否有路由名字
     generateRoute () {
@@ -171,7 +147,7 @@ export default {
     },
     // 判断传值进来的路由是否为当前路由
     isActive (route) {
-      return route.path === this.$route.path && route.name === this.$route.name;
+      return route.path === this.$route.path || route.name === this.$route.name;
     },
     // 由于上面新增了一个route，所以要移除原有的导航栏的样式以及信息
     moveToCurrentTag () {
@@ -218,7 +194,7 @@ export default {
     }
   },
   mounted () {
-    this.addViewTags();
+    // this.addViewTags();
   }
 };
 </script>
@@ -237,7 +213,7 @@ export default {
       height: 36px;
       line-height: 36px;
       border: 1px solid #d8dce5;
-      color: #495060;
+      color: white;
       background: #34495E;
       padding: 0 8px;
       margin-left: 5px;
@@ -295,32 +271,17 @@ export default {
       background: url('../img/blackPoint.png') no-repeat;
 
       .project-model {
-        width: 500px;
-        min-height: 280px;
+        width: 600px;
+        height: 300px;
         display: none;
         position: absolute;
-        top: -324px;
-        right: 0;
+        top: -299px;
+        right: -1px;
         padding: 15px;
         box-sizing: border-box;
         background: white;
         border: 1px solid orange;
         cursor: default;
-
-        ul {
-          overflow: hidden;
-          li {
-            width: 60px;
-            float: left;
-            padding: 15px 22px 27px 22px;
-            cursor: pointer;
-
-            .project-name {
-              display: inline-block;
-              margin: 5px 0 0 5px;
-            }
-          }
-        }
       }
     }
 
@@ -380,4 +341,17 @@ export default {
     }
   }
 }
+  ul.project-lists {
+    overflow: hidden;
+    li {
+      width: 120px;
+      text-align: center;
+      float: left;
+      cursor: pointer;
+
+      .project-name {
+        margin: -10px 0 0 5px;
+      }
+    }
+  }
 </style>

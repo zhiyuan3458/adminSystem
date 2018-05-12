@@ -1,29 +1,28 @@
-import axios from 'axios';
+import { commonRouters } from '@/router/index';
+
 const permission = {
   state: {
+    /* 用来存储路由表 */
     addRouters: [],
     msg: ''
   },
   mutations: {
-    GET_ROUTES: (state, data) => {
-      state.addRouters = data;
+    SET_ROUTERS: (state, data) => {
+      state.addRouters = commonRouters.concat(data);
+    },
+    ADD_ROUTERS: (state, data) => {
+      state.addRouters = commonRouters.concat(data);
     },
     ERR_MSG: (state, msg) => {
       state.msg = msg;
     }
   },
   actions: {
-    getRouters ({commit}) {
-      axios.get('/api/project/list').then(res => {
-        let code = res.code;
-        if (code === 0) {
-          let addRouters = res.data;
-          commit('GET_ROUTES', addRouters);
-        } else {
-          let msg = res.msg;
-          commit('ERR_MSG', msg);
-        }
-      });
+    setRouters ({commit}, data) {
+      commit('SET_ROUTERS', data);
+    },
+    addRouters ({ commit }, data) {
+      commit('ADD_ROUTERS', data);
     }
   }
 };
