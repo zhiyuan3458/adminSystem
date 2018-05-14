@@ -1,7 +1,7 @@
 <template>
 <div class="side-bar-wrapper" ref="sideBarWrapper">
-  <ul @mouseout="handleImgHightlightHidden">
-    <li v-for="(item, index) in asideItems" :key="index" @mouseover="handleImgHightlightShow(index)">
+  <ul @mouseleave="handleImgHightlightHidden">
+    <li v-for="(item, index) in asideItems" :key="index" @mouseenter="handleImgHightlightShow(index)">
       <img :src="activeIndex === index ? item.imgHoverUrl : item.imgUrl" alt="" width="26"  height="26">
     </li>
     <div class="aside-content" :style="{height: treeHeight + 'px'}" v-show="asideBarShow">
@@ -18,8 +18,9 @@
         ref="asideTree"
         @node-click="handleClickTree">
           <span class="custom-tree-node" slot-scope="{ node, data }">
-          <span>{{ node.label }}</span>
-      </span>
+            <span v-if="node.children">{{ node.label }}</span>
+            <router-link v-else tag="span" :to="data.path">{{node.label}}</router-link>
+          </span>
       </el-tree>
     </div>
   </ul>
@@ -41,6 +42,7 @@ export default {
     return {
       // 侧导航栏的信息
       asideItems: [],
+      treeArray: [],
       activeIndex: -1,
       // 是否让树形结构显示
       asideBarShow: false,
@@ -48,46 +50,9 @@ export default {
       treeHeight: 0,
       filterText: '',
       // 树形数据
-      asideTreeData: [
-        {
-        id: 1,
-        label: '一级 1',
-        children: [{
-          id: 4,
-          label: '二级 1-1',
-          children: [{
-            id: 9,
-            label: '三级 1-1-1',
-            path: '/setting'
-          }, {
-            id: 10,
-            label: '三级 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '一级 2',
-        children: [{
-          id: 5,
-          label: '二级 2-1'
-        }, {
-          id: 6,
-          label: '二级 2-2'
-        }]
-      }, {
-        id: 3,
-        label: '一级 3',
-        children: [{
-          id: 7,
-          label: '二级 3-1'
-        }, {
-          id: 8,
-          label: '二级 3-2'
-        }]
-      }],
+      asideTreeData: [],
       defaultProps: {
-        children: 'children',
-        label: 'label'
+        label: 'name'
       },
       // 用来记住递归获取到的叶子节点
       leaves: []
@@ -98,6 +63,7 @@ export default {
     handleImgHightlightShow (index) {
       this.activeIndex = index;
       this.asideBarShow = true;
+      this.asideTreeData = this.treeArray[index];
     },
     // 鼠标移出去侧导航栏，树形组件消失
     handleImgHightlightHidden () {
@@ -115,7 +81,6 @@ export default {
       if (node.isLeaf) {
         this.$router.push(node.data.path);
       } else {
-
       }
     },
 
@@ -166,9 +131,12 @@ export default {
               imgHoverUrl: require(`@/common/img/roadMaintainceSystem/${item.imgUrl}.png`)
             });
             this.asideItems.push(obj);
+            this.treeArray.push(item.children);
             this.getLeave(item);
           });
-          // this.addRouters.find(item => item.id === this.projectList[0].id).children = this.addRouters.find(item => item.id === this.projectList[0].id).children.concat(this.leaves);
+          this.addRouters.find(item => item.id === this.projectList[0].id).children = this.addRouters.find(item => item.id === this.projectList[0].id).children.concat(this.leaves);
+          this.$router.addRoutes(this.addRouters);
+          sessionStorage.setItem('routers', JSON.stringify(this.addRouters));
         }
       });
     }
@@ -244,5 +212,17 @@ export default {
       fill: white;
     }
   }
+}
+</style>
+
+<style lang="less">
+  /* 树形结构的节点 */
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
 }
 </style>

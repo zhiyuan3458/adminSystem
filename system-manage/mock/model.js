@@ -39,7 +39,10 @@ const models = {
         name: {type: String, require: true},
         imgUrl: {type: String, require: true},
         path: {type: String, require: true},
-        componentName: {type: String, require: true}
+        componentName: {type: String, require: true},
+        meta: {
+          title: {type: String}
+        }
       }
     ]
   }

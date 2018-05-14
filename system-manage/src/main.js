@@ -9,7 +9,7 @@ import axios from 'axios';
 import '@/components/global.js';
 import './permission';
 import { getHttp } from '@/api/api';
-import {ERR_OK} from "./common/js/flag";
+import {ERR_OK} from './common/js/flag';
 import { deepClone } from '@/common/js/util';
 
 const _import = require('./router/_import_' + process.env.NODE_ENV);
@@ -32,6 +32,8 @@ getHttp('/api/project/list', '').then(res => {
           }
         ]
       });
+      console.log(123);
+      console.log(route);
       addRoutes.push(route);
     });
     router.addRoutes(addRoutes);

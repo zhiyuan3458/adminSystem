@@ -173,8 +173,8 @@ const menus = model.getModel('menus');
 // menus.remove({}, function (err, doc) {
 //   console.log(doc);
 // });
-
-// menus.create({projectId: 1, name: '基础数据管理', imgUrl: 'database', children: [{name: '区间路段信息', imgUrl: 'earth_search', path: '/table', componentName: 'roadMaintenanceSystem/table'}, {name: '养护路段信息', imgUrl: 'share_service', path: '/charts/charts', componentName: 'charts/charts'}]}, function (err, doc) {
+//
+// menus.create({projectId: 1, name: '基础数据管理', imgUrl: 'database', children: [{name: '道路养护系统', imgUrl: 'earth_search', path: '/table', componentName: 'roadMaintenanceSystem/table', meta: {title: '区间路段信息'}}, {name: '道路养护系统', imgUrl: 'share_service', path: '/charts/charts', componentName: 'charts/charts', meta: {title: '养护路段信息'}}]}, function (err, doc) {
 //   console.log(213);
 // });
 
