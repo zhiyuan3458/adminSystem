@@ -14,26 +14,24 @@ import { deepClone } from '@/common/js/util';
 
 const _import = require('./router/_import_' + process.env.NODE_ENV);
 
-getHttp('/api/project/list', '').then(res => {
+getHttp('/api/subsystem', '').then(res => {
   if (res.data.code === 200) {
     let data = res.data.data;
     let addRoutes = [];
     data.forEach(item => {
       let route = Object.assign({}, {
-        id: 1,
+        id: item.id,
         name: item.name,
         path: item.path,
         component: _import('mainFrame/mainFrame'),
         children: [
           {
             name: item.name,
-            path: item.children[0].path,
-            component: _import(item.children[0].componentName)
+            path: '',
+            component: _import(item.componentName)
           }
         ]
       });
-      console.log(123);
-      console.log(route);
       addRoutes.push(route);
     });
     router.addRoutes(addRoutes);

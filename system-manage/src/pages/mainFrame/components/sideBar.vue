@@ -63,7 +63,11 @@ export default {
     handleImgHightlightShow (index) {
       this.activeIndex = index;
       this.asideBarShow = true;
-      this.asideTreeData = this.treeArray[index];
+      if (this.treeArray[index]) {
+        this.asideTreeData = this.treeArray[index];
+      } else {
+        this.asideTreeData = [];
+      }
     },
     // 鼠标移出去侧导航栏，树形组件消失
     handleImgHightlightHidden () {
@@ -121,20 +125,26 @@ export default {
   },
   created () {
     if (this.projectList.length !== 0) {
+      // 获得第一个子系统的id
       let id = this.projectList[0].id;
-      getHttp('/api/project/menu', { id: id }).then(res => {
+      // 异步获取子系统的菜单信息
+      getHttp('/api/carte/listcarte', { subsystemId: id }).then(res => {
         if (res.data.code === this.ERR_OK) {
           let data = res.data.data;
           data.forEach(item => {
             let obj = Object.assign({}, {
-              imgUrl: require(`@/common/img/roadMaintainceSystem/${item.imgUrl}-white.png`),
-              imgHoverUrl: require(`@/common/img/roadMaintainceSystem/${item.imgUrl}.png`)
+              imgUrl: require(`@/common/img/roadMaintainceSystem/${item.iconUrl}-white.png`),
+              imgHoverUrl: require(`@/common/img/roadMaintainceSystem/${item.iconUrl}.png`)
             });
             this.asideItems.push(obj);
-            this.treeArray.push(item.children);
-            this.getLeave(item);
+            // 如果二级菜单栏有children，则递归
+            if (item.children) {
+              this.treeArray.push(item.children);
+              this.getLeave(item);
+            }
           });
-          this.addRouters.find(item => item.id === this.projectList[0].id).children = this.addRouters.find(item => item.id === this.projectList[0].id).children.concat(this.leaves);
+          // 添加到vuex的addRouters
+          this.addRouters.find(item => item.id === id).children = this.addRouters.find(item => item.id === id).children.concat(this.leaves);
           this.$router.addRoutes(this.addRouters);
           sessionStorage.setItem('routers', JSON.stringify(this.addRouters));
         }
