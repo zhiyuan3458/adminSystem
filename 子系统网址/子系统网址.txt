@@ -1,0 +1,3 @@
+道路养护系统：http://14.23.99.106:8666/welcome.action 账号： admin 密码：abcd1234
+
+交易平台：https://192.1.80.31:8085/ctetenderms/login.jsp 账号：admin 密码：000000
