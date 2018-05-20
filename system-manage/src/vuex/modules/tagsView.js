@@ -4,21 +4,39 @@ const tagsView = {
     projectList: [],
     /* 显示在底部导航栏的子系统列表 */
     visitedViews: [],
-    cachedViews: []
+    cachedViews: [],
+    menus: {
+      asideBarMenus: [],
+      treeMenus: []
+    }
   },
   mutations: {
+    /*  所有子系统的列表
+    * 包括子系统的所有路由信息
+    * 子系统id
+    * 子系统name
+    * 子系统path
+    * 子系统redirect
+    * */
     SHOW_ALL_VIEWS: (state, data) => {
       state.projectList = state.projectList.concat(data);
+      state.visitedViews = state.projectList;
     },
+    /*
+     * 显示底部导航栏的所有子系统
+     * */
     ADD_VISITED_VIEWS: (state, view) => {
       /*
-        some表示检测数组的元素是否满足某个条件，比如数组中每个元素的path === view.path
+        some表示检测数组的元素是否满足某个条件，比如数组中每个元素的name === view.name
         返回true或false
       */
-      if (state.visitedViews.some(v => v.path === view.path)) return;
+      if (state.visitedViews.some(v => v.id === view.meta.subSystemId)) return;
       state.visitedViews.push({
         name: view.name,
-        path: view.path
+        path: view.path,
+        meta: {
+          subSystemId: view.meta.subSystemId
+        }
       });
       // if (!view.meta.noCache) {
       //   state.cachedViews.push(view.name);
@@ -55,6 +73,12 @@ const tagsView = {
         }
       }
     },
+    SHOW_ASIDEBAR_MENUS (state, data) {
+      state.menus.asideBarMenus = data;
+    },
+    SHOW_TREE_MENUS (state, data) {
+      state.menus.treeMenus = data;
+    },
     DEL_ALL_VIEWS: (state) => {
       state.visitedViews = [];
       state.cachedViews = [];
@@ -66,6 +90,12 @@ const tagsView = {
     },
     addVisitedViews ({ commit }, view) {
       commit('ADD_VISITED_VIEWS', view);
+    },
+    showAsideBarMenus ({ commit }, data) {
+      commit('SHOW_ASIDEBAR_MENUS', data);
+    },
+    showTreeMenus ({ commit }, data) {
+      commit('SHOW_TREE_MENUS', data);
     },
     delVisitedViews ({ commit, state }, view) {
       return new Promise((resolve) => {

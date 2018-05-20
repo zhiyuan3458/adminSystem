@@ -1,222 +1,370 @@
 <template>
-<div class="table-container" ref="tableContainer">
-  <!-- 导航位置 -->
-  <div class="nav-bar" ref="navBar">
-    <el-breadcrumb separator-class="el-icon-minus">
-      <el-breadcrumb-item><span class="el-icon-star-on"></span>首页</el-breadcrumb-item>
-      <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-      <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-      <el-breadcrumb-item>活动详情</el-breadcrumb-item>
-    </el-breadcrumb>
-  </div>
-  <!-- 工具栏 -->
-  <div class="tool-bar" ref="toolBar">
-    <el-button size="mini" @click="handleAdd">新增</el-button>
-    <el-button size="mini" @click="handleDel">删除</el-button>
-  </div>
-  <div class="table-wrapper">
-    <div class="table-title">公路桥涵技术状况评定列表</div>
-    <el-table
-      :data="tableData"
-      size="mini"
-      border
-      :height="tableMaxHeight"
-    >
-      <el-table-column
-        prop="name"
-        label="名字"
-        header-align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="address"
-        label="地址"
-        header-align="center"
-      ></el-table-column>
-      <el-table-column
-        prop="date"
-        label="日期"
-        header-align="center"
-      ></el-table-column>
-    </el-table>
-    <div class="pagenation-wrapper">
-      <input type="text" class="search-input" v-model="search" placeholder="请输入查询内容">
-      <span class="el-icon-search"></span>
-      <el-pagination
-        class="pagenation1"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[100, 200, 300, 400]"
-        :page-size="100"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
-      </el-pagination>
+  <div class="setting">
+    <el-aside>
+      <el-row :gutter="5">
+        <el-col :span="12">
+          <div id="chartColumn" style="width:100%; height:400px;"></div>
+        </el-col>
+        <el-col :span="12">
+          <div id="chartBar" style="width:95%; height:400px;"></div>
+        </el-col>
+      </el-row>
+      <el-row>
+        <el-col :span="12">
+          <div id="chartLine" style="width:100%; height:400px;"></div>
+        </el-col>
+        <el-col :span="12">
+          <div id="chartPie" style="width:100%; height:400px;"></div>
+        </el-col>
+      </el-row>
+    </el-aside>
+
+    <!-- 公告 -->
+    <div class="main">
+      <el-row>
+        <v-NoticeBoard class="modal" :header="backlogContent.header" :content="backlogContent.content" :iconClass="backlogContent.iconClass"></v-NoticeBoard>
+      </el-row>
+      <el-row>
+        <v-NoticeBoard class="modal" :header="backReadContent.header" :content="backReadContent.content" :iconClass="backReadContent.iconClass"></v-NoticeBoard>
+      </el-row>
+      <el-row>
+        <v-NoticeBoard class="modal" :header="noticeContent.header" :content="noticeContent.content" :iconClass="noticeContent.iconClass"></v-NoticeBoard>
+      </el-row>
     </div>
   </div>
-  <div class="pagenation"></div>
-</div>
 </template>
 
-<script type="text/ecmascript-6">
-import { tableData } from './mock';
+<script>
+import echarts from 'echarts';
+import NoticeBoard from '@/components/noticeBoard/NoticeBoard.vue';
+
 export default {
   data () {
     return {
-      tableData: tableData,
-      tableMaxHeight: 0,
-      setTableHeadBackground: 'table-title-class',
-      /* 分页栏参数 */
-      currentPage: 4,
-      search: ''
+      chartColumn: null,
+      chartBar: null,
+      chartLine: null,
+      chartPie: null,
+
+      // 待办事项
+      backlogContent:{
+        header: '待办事项',
+        content: [
+          {
+            id: '1',
+            name: '公路沙凤三路啥地方即可蓝色的',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '2',
+            name: '公路沙凤三路啥地方即可蓝色的1',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '3',
+            name: '公路沙凤三路啥地方即可蓝色的2',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '4',
+            name: '公路沙凤三路啥地方即可蓝色的3',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '5',
+            name: '公路沙凤三路啥地方即可蓝色的4',
+            time: '2018-10-31 14:20'
+          }
+        ],
+        iconClass: 'el-icon-tickets'
+      },
+      backReadContent:{
+        header: '待办事项',
+        content: [
+          {
+            id: '1',
+            name: '公路沙凤三路啥地方即可蓝色的',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '2',
+            name: '公路沙凤三路啥地方即可蓝色的1',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '3',
+            name: '公路沙凤三路啥地方即可蓝色的2',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '4',
+            name: '公路沙凤三路啥地方即可蓝色的2',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '5',
+            name: '公路沙凤三路啥地方即可蓝色的2',
+            time: '2018-10-31 14:20'
+          }
+        ],
+        iconClass: 'icon-book-open'
+      },
+      noticeContent:{
+        header: '待办事项',
+        content: [
+          {
+            id: '1',
+            name: '公路沙凤三路啥地方即可蓝色的',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '2',
+            name: '公路沙凤三路啥地方即可蓝色的1',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '3',
+            name: '公路沙凤三路啥地方即可蓝色的2',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '4',
+            name: '公路沙凤三路啥地方即可蓝色的2',
+            time: '2018-10-31 14:20'
+          },
+          {
+            id: '5',
+            name: '公路沙凤三路啥地方即可蓝色的2',
+            time: '2018-10-31 14:20'
+          }
+        ],
+        iconClass: 'icon-info'
+      }
     };
   },
-  watch: {
-    opened () {
-      // 40是分页的高度，39是footer和表格的蓝色背景标题栏的高度
-      if (this.opened) {
-        this.tableMaxHeight = this.$refs.tableContainer.offsetHeight - this.$refs.navBar.offsetHeight - this.$refs.toolBar.offsetHeight - 38 - 40 -10;
-      } else {
-        this.tableMaxHeight = this.$refs.tableContainer.offsetHeight - this.$refs.navBar.offsetHeight - this.$refs.toolBar.offsetHeight - 38 - 40 - 10;
-      }
-    }
+
+  components: {
+    'v-NoticeBoard': NoticeBoard
   },
+
   methods: {
-    handleAdd () {
+    drawColumnChart () {
+      this.chartColumn = echarts.init(document.getElementById('chartColumn'), {
+        width: arguments[0],
+        height: arguments[1]
+      });
+      this.chartColumn.setOption({
+        title: { text: 'Column Chart' },
+        tooltip: {},
+        xAxis: {
+          data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
+        },
+        yAxis: {},
+        series: [{
+          name: '销量',
+          type: 'bar',
+          data: [5, 20, 36, 10, 10, 20]
+        }]
+      });
     },
-    handleDel () {
+    drawBarChart () {
+      this.chartBar = echarts.init(document.getElementById('chartBar'));
+      this.chartBar.setOption({
+        title: {
+          text: 'Bar Chart',
+          subtext: '数据来自网络'
+        },
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          data: ['2011年', '2012年']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'value',
+          boundaryGap: [0, 0.01],
+          axisLabel: {
+            show: true,
+            rotate:45,
+            interval: 0
+          }
+        },
+        yAxis: {
+          type: 'category',
+          data: ['巴西', '印尼', '美国', '印度', '中国', '世界人口(万)']
+        },
+        series: [
+          {
+            name: '2011年',
+            type: 'bar',
+            data: [18203, 23489, 29034, 104970, 131744, 630230]
+          },
+          {
+            name: '2012年',
+            type: 'bar',
+            data: [19325, 23438, 31000, 121594, 134141, 681807]
+          }
+        ]
+      });
     },
-    /* 分页方法 */
-    handleSizeChange () {
+    drawLineChart () {
+      this.chartLine = echarts.init(document.getElementById('chartLine'));
+      this.chartLine.setOption({
+        title: {
+          text: 'Line Chart'
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          data: ['邮件营销', '联盟广告', '搜索引擎']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            name: '邮件营销',
+            type: 'line',
+            stack: '总量',
+            data: [120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name: '联盟广告',
+            type: 'line',
+            stack: '总量',
+            data: [220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name: '搜索引擎',
+            type: 'line',
+            stack: '总量',
+            data: [820, 932, 901, 934, 1290, 1330, 1320]
+          }
+        ]
+      });
     },
-    handleCurrentChange () {
+    drawPieChart () {
+      this.chartPie = echarts.init(document.getElementById('chartPie'));
+      this.chartPie.setOption({
+        title: {
+          text: 'Pie Chart',
+          subtext: '纯属虚构',
+          x: 'center'
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        legend: {
+          orient: 'vertical',
+          left: 'left',
+          data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
+        },
+        series: [
+          {
+            name: '访问来源',
+            type: 'pie',
+            radius: '55%',
+            center: ['50%', '60%'],
+            data: [
+              { value: 335, name: '直接访问' },
+              { value: 310, name: '邮件营销' },
+              { value: 234, name: '联盟广告' },
+              { value: 135, name: '视频广告' },
+              { value: 1548, name: '搜索引擎' }
+            ],
+            itemStyle: {
+              emphasis: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
+              }
+            }
+          }
+        ]
+      });
+    },
+    drawCharts () {
+      this.drawColumnChart();
+      this.drawBarChart();
+      this.drawLineChart();
+      this.drawPieChart();
     }
   },
-  created () {
-    this.$nextTick(() => {
-      // 40是分页的高度，39是footer和表格的蓝色背景标题栏的高度
-      this.tableMaxHeight = this.$parent.$refs.mainContainerWrapper.offsetHeight - this.$refs.navBar.offsetHeight - this.$refs.toolBar.offsetHeight - 38 - 40 - 10;
-    });
+
+  mounted: function () {
+    this.drawCharts();
+    let that = this;
+    window.onresize = function windowResize() {
+      let chartColumn = document.getElementById('chartColumn');
+      let chartLine = document.getElementById('chartLine');
+      let chartBar = document.getElementById('chartBar');
+      let chartPie = document.getElementById('chartPie');
+      let chartColumnWidth = chartColumn.offsetWidth;
+      let chartLineWidth = chartLine.offsetWidth;
+      let chartBarWidth = chartBar.offsetWidth;
+      let chartPieWidth = chartPie.offsetWidth;
+      that.chartColumn.resize({width: chartColumnWidth, height: 400});
+      that.chartBar.resize({width: chartLineWidth, height: 400});
+      that.chartLine.resize({width: chartBarWidth, height: 400});
+      that.chartPie.resize({width: chartPieWidth, height: 400});
+    };
+  },
+  updated: function () {
+    this.drawCharts();
   }
 };
 </script>
 
-<style lang="less">
-@import "../../common/less/theme";
-/* 表头顶部背景 */
-@table-title-bg-color: #56A2E8;
-/* 表头背景 */
-@table-head-bg-color: #F9E7CD;
-/* 分页组件背景色 */
-@pagenation-bg-color: #e1edf9;
-
-.table-container {
-  /* 顶部面包屑导航栏 */
-  .nav-bar {
-    display: inline-block;
-    margin: 5px 0;
-    .content;
-
-    .el-icon-star-on {
-      display: inline-block;
-      margin-right: 5px;
-      color: #F59C00;
-    }
-
-    .el-breadcrumb__inner {
-      font-family: "宋体";
-      color: #333;
-      font-size: 12px;
-      font-weight: 100 !important;
+<style scoped lang="less">
+@import "common/css/fonts.css";
+.setting {
+  margin-top: 20px;
+  overflow: hidden;
+  @media only screen and (min-device-width: 1439px) {
+    .el-aside {
+      width: 68%!important;
     }
   }
-  /* 表格工具栏 */
-  .tool-bar {
-    padding-top: 7px;
-    padding-bottom: 7px;
-    border-bottom: 1px solid #ddd;
-
-    .el-button--mini, .el-button--mini.is-round {
-      padding: 6px;
-      .content;
-    }
-
-    .el-icon-back {
-      color: #5CC48F;
-      font-weight: 700;
-    }
-
-    .el-icon-plus {
-      color: #D85C0D;
-      font-weight: 700;
-    }
-
-    .el-icon-delete {
-      color: #DC3F2C;
-      font-weight: 700;
-    }
-
-    .el-icon-upload2 {
-      color: #217FBC;
-      font-weight: 700;
-    }
-
-    .el-icon-download {
-      color: #2FA2E0;
-      font-weight: 700;
+  @media only screen and (min-device-width: 1279px) {
+    .el-aside {
+      width: 66%!important;
     }
   }
-  /* 表格 */
-  .table-wrapper {
-    .table-title {
-      width: 100%;
-      height: 21px;
-      line-height: 21px;
-      padding: 5px 0;
-      background: @table-title-bg-color;
-      color: #fff;
-      text-align: center;
-      .title;
-    }
+  .el-aside {
+    margin-top: 10px;
+    float: left;
+    overflow-x: hidden;
+  }
 
-    .has-gutter tr th {
-      color: #333;
-      font-size: 12px;
-      font-weight: bold;
-      background: #F9E7CD!important;
-    }
+  .main {
+    width: 28%;
+    float: left;
+    margin: 20px 5px 0 5px;
 
-    .cell {
-      .content;
-      line-height: 18px;
-    }
-
-    .pagenation-wrapper {
-      width: 100%;
-      height: 38px;
-      overflow: hidden;
-      border: 1px solid #ddd;
-      border-top: 0;
-      border-bottom: 0;
-      box-sizing: border-box;
-      background: @pagenation-bg-color;
-
-      .search-input {
-        min-height: 23px;
-        padding-left: 5px;
-        display: inline-block;
-        margin: 5px 0 0 10px;
-        border: 1px solid #ddd;
-      }
-
-      .el-icon-search {
-        color: #217FBC;
-        cursor: pointer;
-      }
-
-      .pagenation1 {
-        float: right;
-        margin: 3px 5px 0 0;
-      }
+    .el-row {
+      margin-bottom: 30px;
     }
   }
 }

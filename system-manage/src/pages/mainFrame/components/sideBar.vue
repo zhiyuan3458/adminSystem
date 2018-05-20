@@ -1,7 +1,7 @@
 <template>
 <div class="side-bar-wrapper" ref="sideBarWrapper">
   <ul @mouseleave="handleImgHightlightHidden">
-    <li v-for="(item, index) in asideItems" :key="index" @mouseenter="handleImgHightlightShow(index)">
+    <li v-for="(item, index) in menus.asideBarMenus" :key="index" @mouseenter="handleImgHightlightShow(index)">
       <img :src="activeIndex === index ? item.imgHoverUrl : item.imgUrl" alt="" width="26"  height="26">
     </li>
     <div class="aside-content" :style="{height: treeHeight + 'px'}" v-show="asideBarShow">
@@ -33,7 +33,7 @@ import { mapGetters } from 'vuex';
 import { getHttp } from '@/api/api';
 import hamburger from '@/components/hamburger/hamburger.vue';
 const _import = require('@/router/_import_' + process.env.NODE_ENV);
-
+import { deepClone } from '@/common/js/util';
 export default {
   components: {
     hamburger
@@ -63,8 +63,8 @@ export default {
     handleImgHightlightShow (index) {
       this.activeIndex = index;
       this.asideBarShow = true;
-      if (this.treeArray[index]) {
-        this.asideTreeData = this.treeArray[index];
+      if (this.menus.treeMenus[index]) {
+        this.asideTreeData = this.menus.treeMenus[index];
       } else {
         this.asideTreeData = [];
       }
@@ -114,27 +114,55 @@ export default {
     // sideBar的横竖三条属性和navBar展开与隐藏
     ...mapGetters([
       'sideBar',
-      'projectList',
-      'addRouters'
+      'currentRoute',
+      'menus'
     ])
   },
   watch: {
     filterText (val) {
       this.$refs.asideTree.filter(val);
     }
+//    currentRoute () {
+//      console.log(4213);
+//      let { id } = this.currentRoute[0];
+//      this.asideItems = [];
+//      this.treeArray = [];
+//      getHttp('/api/front/carte/listcarte', { subsystemId: id }).then(res => {
+//        if (res.data.code === this.ERR_OK) {
+//          let data = res.data.data;
+//          data.forEach(item => {
+//            let obj = Object.assign({}, {
+//              imgUrl: require(`@/pages/${item.iconUrl}-white.png`),
+//              imgHoverUrl: require(`@/pages/${item.iconUrl}.png`)
+//            });
+//            this.asideItems.push(obj);
+//            // 如果二级菜单栏有children，则递归
+//            if (item.children) {
+//              this.treeArray.push(item.children);
+//              this.getLeave(item);
+//            }
+//          });
+//          // 添加到vuex的addRouters
+////          console.log(this.addRouters.find(item => item.id === id));
+//          // addMenus把子路由信息添加进currentRoute中
+////          this.$store.dispatch('addMenus', this.leaves);
+////          this.$router.addRoutes(this.currentRoute);
+//        }
+//      });
+//    }
   },
   created () {
-    if (this.projectList.length !== 0) {
+    if (this.currentRoute.length !== 0) {
       // 获得第一个子系统的id
-      let id = this.projectList[0].id;
+      let { id } = this.currentRoute[0];
       // 异步获取子系统的菜单信息
-      getHttp('/api/carte/listcarte', { subsystemId: id }).then(res => {
+      getHttp('/api/front/carte/listcarte', { subsystemId: id }).then(res => {
         if (res.data.code === this.ERR_OK) {
           let data = res.data.data;
           data.forEach(item => {
             let obj = Object.assign({}, {
-              imgUrl: require(`@/common/img/roadMaintainceSystem/${item.iconUrl}-white.png`),
-              imgHoverUrl: require(`@/common/img/roadMaintainceSystem/${item.iconUrl}.png`)
+              imgUrl: require(`@/pages/${item.iconUrl}-white.png`),
+              imgHoverUrl: require(`@/pages/${item.iconUrl}.png`)
             });
             this.asideItems.push(obj);
             // 如果二级菜单栏有children，则递归
@@ -143,10 +171,6 @@ export default {
               this.getLeave(item);
             }
           });
-          // 添加到vuex的addRouters
-          this.addRouters.find(item => item.id === id).children = this.addRouters.find(item => item.id === id).children.concat(this.leaves);
-          this.$router.addRoutes(this.addRouters);
-          sessionStorage.setItem('routers', JSON.stringify(this.addRouters));
         }
       });
     }

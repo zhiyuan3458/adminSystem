@@ -1,6 +1,8 @@
 <template>
   <transition mode="out-in" enter-active-class="fadeIn" leave-active-class="fadeOut" appear>
-    <router-view></router-view>
+    <navigation>
+      <router-view></router-view>
+    </navigation>
   </transition>
 </template>
 

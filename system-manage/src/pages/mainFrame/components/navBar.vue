@@ -9,6 +9,7 @@
         v-for="tag in Array.from(visitedViews)"
         :key="tag.path"
         @contextmenu.prevent.native="openMenu(tag, $event)"
+        @click.native="addToNavBar(tag.name)"
       >
         {{tag.name}}
         <span class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
@@ -26,7 +27,7 @@
                   v-for="item in swiper"
                   :key="item.path"
                   :to="item.path"
-                  @click.native="addToNavBar"
+                  @click.native="addToNavBar(tag.name)"
                 >
                   <img src="../img/project.png" alt="">
                   <p class="project-name">{{item.name}}</p>
@@ -102,16 +103,15 @@ export default {
     ...mapGetters([
       'sideBar',
       'visitedViews',
-      'projectList'
+      'projectList',
+      'currentRoute'
     ])
   },
 
   watch: {
     // 就是$route: function()简写
-//    $route () {
-//      this.addViewTags();
-//      this.moveToCurrentTag();
-//    },
+    $route (to, from) {
+    },
     /*
       value是visible现在的值
       true表示要右键选项卡出来了，要监听右键menu的事件
@@ -127,7 +127,12 @@ export default {
   },
 
   methods: {
-    addToNavBar () {
+    addToNavBar (subSystemName) {
+      // 清空currentRoutes
+      this.$store.dispatch('removeCurrentRoutes');
+      const currentRoute = this.projectList.find(item => subSystemName === item.name);
+      // 设置新的子系统的路由首页信息
+      this.$store.dispatch('setCurrrentRoute', currentRoute);
       this.addViewTags();
     },
     // 判断该路由是否有路由名字
@@ -147,7 +152,7 @@ export default {
     },
     // 判断传值进来的路由是否为当前路由
     isActive (route) {
-      return route.path === this.$route.path || route.name === this.$route.name;
+      return route.id === this.$route.meta.subSystemId;
     },
     // 由于上面新增了一个route，所以要移除原有的导航栏的样式以及信息
     moveToCurrentTag () {
@@ -224,9 +229,9 @@ export default {
         margin-right: 28px;
       }
       &.active {
-        background-color: #42b983;
+        background-color: #2196f3;
         color: #fff;
-        border-color: #42b983;
+        border-color: #2196f3;
         &::before {
           content: '';
           background: #fff;

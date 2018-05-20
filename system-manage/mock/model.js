@@ -10,11 +10,12 @@ const models = {
     name: {type: String, require: true},
     path: {type: String, require: true},
     componentName: {type: String, require: true, default: 'mainFrame'},
+    iconUrl: {type: String, require: true, default: 'mainFrame'},
     children: [
       {
         path: {type: String, require: true, default: '/index'},
         name: {type: String, require: true},
-        imgUrl: {type: String, default: ''},
+        iconUrl: {type: String, default: ''},
         componentName: {type: String, require: true},
         meta: {
           title: {type: String, require: true}
@@ -23,7 +24,7 @@ const models = {
           {
             path: {type: String, default: '/index'},
             name: {type: String},
-            imgUrl: {type: String, default: ''},
+            iconUrl: {type: String, default: ''},
             componentName: {type: String}
           }
         ]
@@ -31,13 +32,13 @@ const models = {
     ]
   },
   menus: {
-    projectId: {type: String, require: true},
+    subsystemId: {type: String, require: true},
     name: {type: String, require: true},
-    imgUrl: {type: String, require: true},
+    iconUrl: {type: String, require: true},
     children: [
       {
-        name: {type: String, require: true},
-        imgUrl: {type: String, require: true},
+        name: {type: String, require: true, default: '道路养护系统'},
+        iconUrl: {type: String, require: true},
         path: {type: String, require: true},
         componentName: {type: String, require: true},
         meta: {

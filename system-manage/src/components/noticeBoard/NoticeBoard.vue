@@ -25,7 +25,6 @@ export default {
   },
   data () {
     return {
-
     };
   }
 };
@@ -33,7 +32,6 @@ export default {
 
 <style lang="less">
 @import "../../common/less/base.less";
-
 /*@media only screen and (min-device-width: 1920px) {*/
   /*.notice-modal {*/
     /*width: 600px;*/
@@ -54,6 +52,7 @@ export default {
 
 .notice-modal {
     width: 100%;
+    min-height: 280px;
     box-sizing: border-box;
     padding: 10px 8px;
     border: 1px solid #EAEAEA;
@@ -76,9 +75,13 @@ export default {
     .content {
         ul {
             li {
-                padding: 10px 0;
+                padding: 12px 0;
                 overflow: hidden;
-                .border-px(1px, #F5F5F5);
+                border-bottom: 1px solid #F5F5F5;
+
+                &:last-of-type {
+                  border-bottom: 0;
+                }
                 .itemName {
                     width: 46%;
                     float: left;

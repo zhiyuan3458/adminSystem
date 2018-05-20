@@ -83,86 +83,14 @@ const menus = model.getModel('menus');
 // projects.create({
 //   name: '道路养护系统',
 //   path: '/roadMaintenanceSystem',
-//   componentName: 'mainFrame',
+//   redirect: '/roadMaintenanceSystem',
+//   componentName: 'roadMaintenanceSystem/index',
 //   children: [
 //     {
 //       path: '/',
 //       name: '道路养护系统',
-//       componentName: 'roadMaintenanceSystem/index',
 //       meta: {
 //         title: '道路养护系统'
-//       }
-//     },
-//     {
-//       path: '/standard',
-//       name: '道路养护系统',
-//       imgUrl: 'standard',
-//       componentName: 'roadMaintenanceSystem/standard',
-//       meta: {
-//         title: '规范标准管理'
-//       }
-//     },
-//     {
-//       path: '/basicData',
-//       name: '道路养护系统',
-//       imgUrl: 'database',
-//       componentName: 'roadMaintenanceSystem/basicData',
-//       meta: {
-//         title: '基础数据管理'
-//       }
-//     },
-//     {
-//       path: '/maintenanceService',
-//       name: '道路养护系统',
-//       imgUrl: 'daily-maintenance',
-//       componentName: 'roadMaintenanceSystem/maintenanceService',
-//       meta: {
-//         title: '养护业务管理'
-//       }
-//     },
-//     {
-//       path: '/monitorAndGuard',
-//       name: '道路养护系统',
-//       componentName: 'roadMaintenanceSystem/monitorAndGuard',
-//       imgUrl: 'safeguard',
-//       meta: {
-//         title: '监测及应急保障'
-//       }
-//     },
-//     {
-//       path: '/scienceDecision',
-//       name: '道路养护系统',
-//       imgUrl: 'gradmale_avatar',
-//       componentName: 'roadMaintenanceSystem/scienceDecision',
-//       meta: {
-//         title: '科学决策'
-//       }
-//     },
-//     {
-//       path: '/scienceDecision',
-//       name: '道路养护系统',
-//       imgUrl: 'earth_search',
-//       componentName: 'roadMaintenanceSystem/scienceDecision',
-//       meta: {
-//         title: '综合查询'
-//       }
-//     },
-//     {
-//       path: '/informationSharing',
-//       name: '道路养护系统',
-//       imgUrl: 'share_service',
-//       componentName: 'roadMaintenanceSystem/informationSharing',
-//       meta: {
-//         title: '信息共享'
-//       }
-//     },
-//     {
-//       path: '/systemManage',
-//       name: '道路养护系统',
-//       imgUrl: 'tool',
-//       componentName: 'roadMaintenanceSystem/systemManage',
-//       meta: {
-//         title: '系统管理'
 //       }
 //     }
 //   ]
@@ -174,12 +102,12 @@ const menus = model.getModel('menus');
 //   console.log(doc);
 // });
 //
-// menus.create({projectId: 1, name: '基础数据管理', imgUrl: 'database', children: [{name: '道路养护系统', imgUrl: 'earth_search', path: '/table', componentName: 'roadMaintenanceSystem/table', meta: {title: '区间路段信息'}}, {name: '道路养护系统', imgUrl: 'share_service', path: '/charts/charts', componentName: 'charts/charts', meta: {title: '养护路段信息'}}]}, function (err, doc) {
+// menus.create({subsystemId: 1, name: '基础数据管理', iconUrl: 'database', children: [{name: '道路养护系统', iconUrl: 'earth_search', path: '/table', componentName: 'roadMaintenanceSystem/table', meta: {title: '区间路段信息'}}, {name: '道路养护系统', iconUrl: 'share_service', path: '/charts/charts', componentName: 'charts/charts', meta: {title: '养护路段信息'}}]}, function (err, doc) {
 //   console.log(213);
 // });
 
 /* 获取所有项目 */
-router.get('/list', function (req, res) {
+router.get('/subsystem', function (req, res) {
   projects.find({}, function (err, doc) {
     if (!err) {
       res.json({code: 200, data: doc});
@@ -190,9 +118,9 @@ router.get('/list', function (req, res) {
 });
 
 // 获取子列表
-router.get('/menu', function (req, res) {
+router.get('/carte/listcarte', function (req, res) {
   let { id } = req.query;
-  menus.find({projectId: id}, function (err, doc) {
+  menus.find({subsystemId: id}, function (err, doc) {
     res.json({code: 200, data: doc});
   });
 });
