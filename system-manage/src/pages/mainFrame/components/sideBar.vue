@@ -1,7 +1,7 @@
 <template>
 <div class="side-bar-wrapper" ref="sideBarWrapper">
-  <ul @mouseleave="handleImgHightlightHidden">
-    <li v-for="(item, index) in menus.asideBarMenus" :key="index" @mouseenter="handleImgHightlightShow(index)">
+  <ul @mouseleave="handleImgHightlightHidden" class="aside-bar-ul">
+    <li class="aside-bar-li" v-for="(item, index) in menus.asideBarMenus" :key="index" @mouseenter="handleImgHightlightShow(index)" :class="{active: activeIndex === index}">
       <img :src="activeIndex === index ? item.imgHoverUrl : item.imgUrl" alt="" width="26"  height="26">
     </li>
     <div class="aside-content" :style="{height: treeHeight + 'px'}" v-show="asideBarShow">
@@ -9,19 +9,7 @@
         placeholder="输入关键字进行过滤"
         v-model="filterText">
       </el-input>
-
-      <el-tree
-        class="filter-tree"
-        :data="asideTreeData"
-        :props="defaultProps"
-        :filter-node-method="filterNode"
-        ref="asideTree"
-        @node-click="handleClickTree">
-          <span class="custom-tree-node" slot-scope="{ node, data }">
-            <span v-if="node.children">{{ node.label }}</span>
-            <router-link v-else tag="span" :to="data.path">{{node.label}}</router-link>
-          </span>
-      </el-tree>
+      <ul id="treeNavBar" class="ztree"></ul>
     </div>
   </ul>
   <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sideBar.opened"></hamburger>
@@ -30,10 +18,9 @@
 
 <script type="text/ecmascript-6">
 import { mapGetters } from 'vuex';
-import { getHttp } from '@/api/api';
+import { getHttp } from '@/api/util';
 import hamburger from '@/components/hamburger/hamburger.vue';
 const _import = require('@/router/_import_' + process.env.NODE_ENV);
-import { deepClone } from '@/common/js/util';
 export default {
   components: {
     hamburger
@@ -42,20 +29,20 @@ export default {
     return {
       // 侧导航栏的信息
       asideItems: [],
-      treeArray: [],
       activeIndex: -1,
+      treeArray: [],
       // 是否让树形结构显示
       asideBarShow: false,
+      filterText: '',
       // 树形高度
       treeHeight: 0,
-      filterText: '',
       // 树形数据
       asideTreeData: [],
-      defaultProps: {
-        label: 'name'
-      },
-      // 用来记住递归获取到的叶子节点
-      leaves: []
+      setting: {
+        callback: {
+          onClick: this.handleClickNode
+        }
+      }
     };
   },
   methods: {
@@ -68,46 +55,25 @@ export default {
       } else {
         this.asideTreeData = [];
       }
+      $.fn.zTree.init($('#treeNavBar'), this.setting, this.asideTreeData);
     },
     // 鼠标移出去侧导航栏，树形组件消失
     handleImgHightlightHidden () {
       this.activeIndex = -1;
       this.asideBarShow = false;
     },
-    // 树形结构查询
-    filterNode (value, data) {
-      if (!value) return true;
-      return data.label.indexOf(value) !== -1;
-    },
 
     // 点击树形结构节点触发
-    handleClickTree (data, node, component) {
-      if (node.isLeaf) {
-        this.$router.push(node.data.path);
-      } else {
+    handleClickNode (event, treeId, treeNode) {
+      if (treeNode.path !== '') {
+        this.$router.push(treeNode.path);
       }
+      // this.$router.push(tree);
     },
 
     // 点击横竖三条触发动画
     toggleSideBar () {
       this.$store.dispatch('toggleSideBar');
-    },
-    // 递归获取叶子节点
-    getLeave (data) {
-      if (data.constructor === Object) {
-        if (data.children) {
-          data.children.forEach(item => {
-            return this.getLeave(item);
-          });
-        } else {
-          let obj = Object.assign({}, {
-            name: data.name,
-            path: data.path,
-            component: _import(data.componentName)
-          });
-          this.leaves.push(obj);
-        }
-      }
     }
   },
   computed: {
@@ -119,9 +85,6 @@ export default {
     ])
   },
   watch: {
-    filterText (val) {
-      this.$refs.asideTree.filter(val);
-    }
 //    currentRoute () {
 //      console.log(4213);
 //      let { id } = this.currentRoute[0];
@@ -165,11 +128,6 @@ export default {
               imgHoverUrl: require(`@/pages/${item.iconUrl}.png`)
             });
             this.asideItems.push(obj);
-            // 如果二级菜单栏有children，则递归
-            if (item.children) {
-              this.treeArray.push(item.children);
-              this.getLeave(item);
-            }
           });
         }
       });
@@ -183,16 +141,17 @@ export default {
 
 <style lang="less">
 @import "../../../common/less/theme.less";
+@import "../../../../plugins/ztree/css/zTreeStyle.css";
 .side-bar-wrapper {
   width: 43px;
   background-color: #34495E;
 
-  ul {
+  .aside-bar-ul {
     width: 100%;
     font-size: 26px;
     margin-top: 10px;
     position: relative;
-    li {
+    .aside-bar-li {
       height: 48px;
       text-align: center;
       line-height: 48px;
@@ -200,7 +159,6 @@ export default {
       box-sizing: border-box;
       cursor: pointer;
       position: relative;
-      box-sizing: border-box;
 
       .hide-img {
         position: absolute;
@@ -214,6 +172,7 @@ export default {
       }
 
       &.active {
+        border-left: 2px solid orange;
         background: #243342;
       }
     }
@@ -227,7 +186,7 @@ export default {
       background: #F1F1F1;
       box-shadow: 5px 10px 6px #ddd;
 
-      .el-tree {
+      #treeNavBar {
         background: #F1F1F1;
         .content;
       }

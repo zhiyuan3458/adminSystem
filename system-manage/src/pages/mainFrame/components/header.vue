@@ -63,7 +63,12 @@
           </el-dropdown>
         </div>
         <div class="select-wrapper">
-          <input type="text">
+          <el-input
+            size="mini"
+            placeholder="请输入内容"
+            suffix-icon="el-icon-search"
+            v-model="globalSearch">
+          </el-input>
         </div>
       </el-row>
     </header>
@@ -84,7 +89,7 @@ export default {
         value: '/charts',
         label: '道路病害系统'
       }],
-      projectName: '' // 选择框的v-model值
+      globalSearch: '' // 选择框的v-model值
     };
   },
 
@@ -139,12 +144,16 @@ export default {
       line-height: 45px;
       float: right;
 
-      .el-input__suffix {
-        top: 1px;
-      }
-
       .el-input__inner {
-        height: 33px;
+        width: 100%;
+        height: 28px;
+        line-height: 28px;
+        -webkit-appearance: none;
+        background-color: #56A2E8;
+        border-radius: 15px;
+        border: 1px solid white;
+        box-sizing: border-box;
+        color: white!important;
       }
     }
 

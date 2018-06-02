@@ -4,6 +4,7 @@ import MainFrame from '@/pages/mainFrame/mainFrame.vue';
 import Login from '@/pages/login/login';
 import lzyTree from '@/components/lzyTree/lzyTree.vue';
 import diuniTree from '@/components/diuniTree/diuniTree.vue';
+import swiper from '@/pages/swiper/swiper.vue';
 const _import = require('./_import_' + process.env.NODE_ENV);
 
 Vue.use(Router);
@@ -12,7 +13,7 @@ export const commonRouters = [
   {
     path: '',
     name: 'MainFrame',
-    component: MainFrame,
+    component: swiper,
     meta: {
       title: 'mainFrame'
     }
@@ -22,6 +23,13 @@ export const commonRouters = [
 export default new Router({
   routes: commonRouters
 });
+
+export const aysncRouter = [
+  {
+    path: '/roadMaintenanceSystem',
+    compnent: MainFrame
+  }
+];
 
 // routes: [
 //   {

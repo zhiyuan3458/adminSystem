@@ -1,21 +1,18 @@
 <template>
   <ul>
-    <diuni-tree :model="treeData"></diuni-tree>
+    <tree-item :model="treeData"></tree-item>
   </ul>
 </template>
 
 <script>
-import diuniTree from '@/components/diuniTree/diuniTree.vue';
-import { treeData } from '@/components/lzyTree/mock.js';
+import treeItem from '@/components/lzyTree/components/treeItem';
 
 export default {
   components: {
-    diuniTree
+    treeItem
   },
-  data () {
-    return {
-      treeData: treeData
-    };
+  props: {
+    treeData: []
   },
   methods: {
     assignData (data) {

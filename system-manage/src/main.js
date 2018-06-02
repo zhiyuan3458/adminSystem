@@ -8,10 +8,17 @@ import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios';
 import '@/components/global.js';
 import './permission';
-import { getHttp } from '@/api/api';
-import {ERR_OK} from './common/js/flag';
-import { deepClone } from '@/common/js/util';
-import Navigation from 'vue-navigation';
+import {ERR_OK} from './common/js/common';
+import '@/common/less/theme.less';
+import '@/utils/util.js';
+
+/* ztree插件 */
+import $ from 'jquery';
+import '../plugins/ztree/js/jquery.ztree.core.min.js';
+import '../plugins/ztree/js/jquery.ztree.excheck.min.js';
+
+/* Web uploader */
+// import '@/components/uploader/webuploader.js';
 
 const _import = require('./router/_import_' + process.env.NODE_ENV);
 
@@ -85,7 +92,6 @@ Vue.prototype.$axios = axios;
 Vue.prototype.ERR_OK = ERR_OK;
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
-Vue.use(Navigation, {router});
 
 /* eslint-disable no-new */
 new Vue({

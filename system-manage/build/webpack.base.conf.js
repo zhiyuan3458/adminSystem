@@ -3,6 +3,7 @@ const path = require('path')
 const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
+var webpack = require('webpack');
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -20,6 +21,13 @@ const createLintingRule = () => ({
 })
 
 module.exports = {
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin('common.js'),
+    new webpack.ProvidePlugin({
+      jQuery: 'jquery',
+      $: 'jquery'
+    })
+  ],
   context: path.resolve(__dirname, '../'),
   entry: {
     app: './src/main.js'
@@ -75,6 +83,14 @@ module.exports = {
           limit: 10000,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
+      },
+      {
+        //视频加载
+          test: /\.(flv|swf)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+          loader: "file-loader",
+          options: {
+            name: utils.assetsPath("video/[name].[hash:7].[ext]")
+          }
       }
     ]
   },

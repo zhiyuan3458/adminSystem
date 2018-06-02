@@ -12,38 +12,35 @@
         @click.native="addToNavBar(tag.name)"
       >
         {{tag.name}}
-        <span class='el-icon-close' @click.prevent.stop='closeSelectedTag(tag)'></span>
       </router-link>
     </scroll-pane>
     <!-- 横竖三点 -->
     <div class="select-project">
       <div class="three-point">
-        <div class="project-model">
-          <swiper :options="swiperOption" ref="mySwiper">
-            <swiper-slide v-for="(swiper, index) in swiperViews" :key="index">
+      <div class="project-model">
+          <swiper :options="swiperOption" class="swiper-box" ref="mySwiper">
+            <swiper-slide class="swiper-item" v-for="(swiper, index) in swiperViews" :key="index">
               <ul class="project-lists">
                 <router-link
                   tag="li"
+                  class="project-list-item"
                   v-for="item in swiper"
                   :key="item.path"
                   :to="item.path"
-                  @click.native="addToNavBar(tag.name)"
+                  @click.native="addToNavBar(item.name)"
                 >
-                  <img src="../img/project.png" alt="">
+                  <img :src="require(`@/${item.iconUrl}`)" alt="">
                   <p class="project-name">{{item.name}}</p>
                 </router-link>
               </ul>
             </swiper-slide>
             <div class="swiper-pagination"  slot="pagination"></div>
+            <div class="swiper-button-prev" slot="button-prev"></div>
+            <div class="swiper-button-prev" slot="button-next"></div>
           </swiper>
         </div>
       </div>
     </div>
-    <ul class="context-menu" v-show="visible" :style="{top: top + 'px', left: left + 'px'}">
-      <li @click="closeSelectedTag(selectedTag)">关闭</li>
-      <li @click="closeOthersTags">关闭其他</li>
-      <li @click="closeAllTags">关闭所有</li>
-    </ul>
   </div>
 </template>
 
@@ -60,15 +57,17 @@ export default {
   },
   data () {
     return {
-      visible: false,
-      navBarVisible: true,
-      contextMenuVisible: false,
+      // visible: false,
+      // navBarVisible: true,
+      // contextMenuVisible: false,
       top: 0,
       left: 0,
       selectedTag: {},
       swiperOption: {
-        pagination: {
-          el: '.swiper-pagination'
+        pagination: '.swiper-pagination',
+        navigation: {
+          nextEl: '.swiper-button-next',
+          prevEl: '.swiper-button-prev'
         }
       }
     };
@@ -100,6 +99,9 @@ export default {
     swiper () {
       return this.$refs.mySwiper.swiper;
     },
+    opened () {
+      return this.sideBar.opened;
+    },
     ...mapGetters([
       'sideBar',
       'visitedViews',
@@ -112,18 +114,23 @@ export default {
     // 就是$route: function()简写
     $route (to, from) {
     },
+    opened () {
+//      $('.tags-view-container').animate({
+//        bottom: this.sideBar.bottomValue
+//      }, 1000);
+    }
     /*
       value是visible现在的值
       true表示要右键选项卡出来了，要监听右键menu的事件
       false表示要右键选项卡隐藏，取消要监听右键menu的事件
     */
-    visible (value) {
-      if (value) {
-        document.body.addEventListener('click', this.closeMenu);
-      } else {
-        document.body.removeEventListener('click', this.closeMenu);
-      }
-    }
+//    visible (value) {
+//      if (value) {
+//        document.body.addEventListener('click', this.closeMenu);
+//      } else {
+//        document.body.removeEventListener('click', this.closeMenu);
+//      }
+//    }
   },
 
   methods: {
@@ -168,35 +175,35 @@ export default {
       });
     },
     // 右键打开项目的选项卡
-    openMenu (tag, e) {
-      this.contextMenuVisible = true;
-      this.selectedTag = tag;
-      this.left = e.clientX;
-      this.top = e.clientY;
-    },
+//    openMenu (tag, e) {
+//      this.contextMenuVisible = true;
+//      this.selectedTag = tag;
+//      this.left = e.clientX;
+//      this.top = e.clientY;
+//    },
     // 关闭选中的选项卡
-    closeSelectedTag (view) {
-      this.$store.dispatch('delVisitedViews', view).then(views => {
-        const lastView = views.slice(-1)[0];
-        if (lastView) {
-          this.$router.push(lastView.path);
-        } else {
-          this.$router.push('/');
-        }
-      });
-    },
+//    closeSelectedTag (view) {
+//      this.$store.dispatch('delVisitedViews', view).then(views => {
+//        const lastView = views.slice(-1)[0];
+//        if (lastView) {
+//          this.$router.push(lastView.path);
+//        } else {
+//          this.$router.push('/');
+//        }
+//      });
+//    },
     // 关闭选中之外的选项卡
-    closeOthersTags () {
-      this.$router.push(this.selectedTag.path);
-      this.$store.dispatch('delOthersViews', this.selectedTag).then(views => {
-        this.moveToCurrentTag();
-      });
-    },
+//    closeOthersTags () {
+//      this.$router.push(this.selectedTag.path);
+//      this.$store.dispatch('delOthersViews', this.selectedTag).then(views => {
+//        this.moveToCurrentTag();
+//      });
+//    },
     // 关闭所有选项卡
-    closeAllTags () {
-      this.$store.dispatch('delAllViews');
-      this.$router.push('/');
-    }
+//    closeAllTags () {
+//      this.$store.dispatch('delAllViews');
+//      this.$router.push('/');
+//    }
   },
   mounted () {
     // this.addViewTags();
@@ -278,7 +285,8 @@ export default {
       .project-model {
         width: 600px;
         height: 300px;
-        display: none;
+        visibility: hidden;
+        z-index: -1;
         position: absolute;
         top: -299px;
         right: -1px;
@@ -287,76 +295,33 @@ export default {
         background: white;
         border: 1px solid orange;
         cursor: default;
+
+        .swiper-container {
+          height: 100%;
+          .project-lists {
+            overflow: hidden;
+            .project-list-item {
+              float: left;
+              text-align: center;
+              padding: 10px;
+              cursor: pointer;
+
+              .project-name {
+                margin-top: -10px;
+              }
+            }
+          }
+        }
       }
     }
 
     &:hover .project-model {
-        display: block;
+      visibility: visible;
     }
 
     &:hover .three-point {
       background: url('../img/whitePoint.png') no-repeat;
     }
   }
-  .contextmenu {
-    margin: 0;
-    background: #fff;
-    z-index: 2;
-    position: absolute;
-    list-style-type: none;
-    padding: 5px 0;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 400;
-    color: #333;
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, .3);
-    li {
-      margin: 0;
-      padding: 7px 16px;
-      cursor: pointer;
-      &:hover {
-        background: #eee;
-      }
-    }
-  }
 }
-</style>
-
-<style lang="less">
-  //reset element css of el-icon-close
-.tags-view-wrapper {
-  .tags-view-item {
-    .el-icon-close {
-      width: 16px;
-      height: 16px;
-      vertical-align: 0;
-      border-radius: 50%;
-      text-align: center;
-      transition: all .3s cubic-bezier(.645, .045, .355, 1);
-      transform-origin: 100% 50%;
-      &:before {
-        transform: scale(.6);
-        display: inline-block;
-        vertical-align: -1px;
-      }
-      &:hover {
-        background-color: #b4bccc;
-        color: #fff;
-      }
-    }
-  }
-}
-  ul.project-lists {
-    overflow: hidden;
-    li {
-      width: 120px;
-      text-align: center;
-      float: left;
-      cursor: pointer;
-
-      .project-name {
-        margin: -10px 0 0 5px;
-      }
-    }
-  }
 </style>

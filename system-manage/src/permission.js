@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import router from './router';
 import store from './vuex';
-import { getHttp } from '@/api/api';
+import { getHttp } from '@/api/util';
 import { deepClone } from '@/common/js/util';
-import { ERR_OK } from './common/js/flag';
+import { ERR_OK } from './common/js/common';
 
 const _import = require('@/router/_import_' + process.env.NODE_ENV);
 
@@ -29,6 +29,22 @@ function getLeaves (data, subSystemId) {
   }
 }
 
+/* 把菜单的树形组件的icon变成静态图片parentIcon与leaveIcon */
+function getTreeMenu (data) {
+  if (Array.isArray(data)) {
+    data.forEach(item => {
+      if (item.children) {
+        // common.js规范，require直接传参数是不行的，只能用字符串加参数命名
+        item.icon = require(`@/common/img/subSystem/${item.iconUrl}`);
+        getTreeMenu(item.children);
+      } else {
+        item.icon = require(`@/${item.iconUrl}`);
+      }
+    });
+  }
+}
+
+// src/src/
 router.beforeEach((to, from, next) => {
   // 有token则直接查找子系统的菜单
   if (store.state.user.token) {
@@ -53,6 +69,7 @@ router.beforeEach((to, from, next) => {
               asideBarMenus.push(obj);
               // 如果二级菜单栏有children，则递归
               if (item.children) {
+                getTreeMenu(item.children);
                 treeMenus.push(item.children);
                 getLeaves(item, to.meta.subSystemId);
               }
@@ -65,10 +82,6 @@ router.beforeEach((to, from, next) => {
             store.dispatch('addMenus', leaves);
             router.addRoutes(store.state.permission.currentRoute);
             // sessionStorage.setItem('subSystemId', store.state.permission.currentRoute[0].id);
-           console.log('to');
-           console.log(to);
-           console.log('from');
-           console.log(from);
             next();
           }
         });
@@ -88,6 +101,7 @@ router.beforeEach((to, from, next) => {
               asideBarMenus.push(obj);
               // 如果二级菜单栏有children，则递归
               if (item.children) {
+                getTreeMenu(item.children);
                 treeMenus.push(item.children);
                 getLeaves(item, to.meta.subSystemId);
               }
@@ -98,9 +112,7 @@ router.beforeEach((to, from, next) => {
             // addMenus把子路由信息添加进currentRoute中
             leaves.push(deepClone(store.state.permission.currentRoute[0].children.find(item => item.path === 'index')));
             store.dispatch('addMenus', leaves);
-            console.log(router);
             router.addRoutes(store.state.permission.currentRoute);
-            console.log(router);
             sessionStorage.setItem('subSystemId', store.state.permission.currentRoute[0].id);
             next();
           }
@@ -127,6 +139,7 @@ router.beforeEach((to, from, next) => {
             path: item.path,
             redirect: item.path + '/index',
             component: _import('mainFrame/mainFrame'),
+            iconUrl: item.iconUrl,
             children: [
               {
                 name: item.name,
@@ -194,7 +207,7 @@ router.beforeEach((to, from, next) => {
                 asideBarMenus.push(obj);
                 // 如果二级菜单栏有children，则递归
                 if (item.children) {
-                  treeMenus = treeMenus.concat(item.children);
+                  treeMenus.push(item.children);
                   getLeaves(item, addRoutes[0].id);
                 }
               });

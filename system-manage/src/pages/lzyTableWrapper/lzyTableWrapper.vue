@@ -172,10 +172,9 @@
 <script type="text/ecmascript-6">
 import { mapGetters } from 'vuex';
 import collapseBar from '@/components/collapseBar/collapseBar.vue';
-import lzyTableWrapper from '@/components/lzyTableWrapper1/lzyTableWrapper.vue';
+
 export default {
   components: {
-    lzyTableWrapper,
     collapseBar
   },
   data () {
@@ -367,7 +366,7 @@ export default {
     // 这是vue的子组件传递给父组件一种方法
     getLzyTableWrapperMarginLeft (...data) {
       console.log(data[0].left);
-      this.marginLeft1 = data[0].left + 10;
+      this.marginLeft = data[0].left + 10;
     },
     // 点击侧导航栏的上部图标触发
     clickTopBtn (e) {
@@ -699,28 +698,6 @@ export default {
           .el-icon-printer {
             color: #F56C6C;
             font-weight: 700;
-          }
-        }
-        .nav-bar {
-          width: 100%;
-          padding-bottom: 8px;
-          display: inline-block;
-          margin: 5px 0;
-          position: relative;
-
-          .el-icon-star-on {
-            display: inline-block;
-            margin-right: 5px;
-            color: #F59C00;
-          }
-
-          &:after {
-            content: ' ';
-            width: 100%;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            border-bottom: 1px solid #ddd;
           }
         }
       }

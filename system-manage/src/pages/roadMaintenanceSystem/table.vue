@@ -52,8 +52,8 @@
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <i class="el-icon-edit-outline" style="color: #F59D03;" @click="handleEdit(scope.row)"></i>
-            <i class="el-icon-close" style="color: #D97B59;"></i>
+            <i class="el-icon-edit-outline" style="color: #F59D03;" @click="handleEdit(scope.$index, scope.row)"></i>
+            <i class="el-icon-close" @click="handleDelete(scope.$index, scope.row)"></i>
           </template>
         </el-table-column>
       </el-table>
@@ -93,7 +93,7 @@ export default {
     opened () {
       // 40是分页的高度，39是footer和表格的蓝色背景标题栏的高度
       if (this.opened) {
-        this.tableMaxHeight = this.$refs.tableContainer.offsetHeight - this.$refs.navBar.offsetHeight - this.$refs.toolBar.offsetHeight - 38 - 40 -10;
+        this.tableMaxHeight = this.$refs.tableContainer.offsetHeight - this.$refs.navBar.offsetHeight - this.$refs.toolBar.offsetHeight - 38 - 40 - 10;
       } else {
         this.tableMaxHeight = this.$refs.tableContainer.offsetHeight - this.$refs.navBar.offsetHeight - this.$refs.toolBar.offsetHeight - 38 - 40 - 10;
       }
@@ -104,13 +104,18 @@ export default {
     },
     handleDel () {
     },
-    handleEdit (row) {
+    handleEdit (index, row) {
       console.log(row);
     },
-    /* 分页方法 */
-    handleSizeChange () {
+    handleDelete (index, row) {
+      console.log(index, row);
     },
-    handleCurrentChange () {
+    /* 分页方法 */
+    handleSizeChange (val) {
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange (val) {
+      console.log(`当前页: ${val}`);
     }
   },
   created () {
@@ -212,11 +217,15 @@ export default {
         .title;
       }
 
-      .has-gutter tr th {
+      .el-table__header tr th {
         color: #333;
         font-size: 12px;
         font-weight: bold;
         background: #F9E7CD!important;
+
+        .el-checkbox__inner {
+          z-index: auto;
+        }
       }
 
       .cell {

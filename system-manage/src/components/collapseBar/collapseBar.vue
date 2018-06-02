@@ -1,7 +1,9 @@
 <template>
   <div class="collapsed-wrapper" ref="collapsedWrapper" :style="{width: collapsedWrapperWidth + 'px', marginLeft: collapsedWrapperMarginLeft + 'px'}">
-    <slot name="header"></slot>
-    <slot name="content"></slot>
+    <div class="collapsed-content">
+      <slot name="header"></slot>
+      <slot name="content"></slot>
+    </div>
     <div class="arrow-wrapper" @mousedown="drag">
       <div class="arrowIcon" :class="arrowClass" @click.stop="handleCollapse"></div>
     </div>
@@ -198,6 +200,10 @@ export default {
   box-sizing: border-box;
   position: relative;
   float: left;
+
+  .collapsed-content {
+    overflow: hidden;
+  }
 
   .arrow-wrapper {
     width: 10px;

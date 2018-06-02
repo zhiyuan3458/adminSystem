@@ -340,7 +340,6 @@ export default {
 <style scoped lang="less">
 @import "common/css/fonts.css";
 .setting {
-  margin-top: 20px;
   overflow: hidden;
   @media only screen and (min-device-width: 1439px) {
     .el-aside {
